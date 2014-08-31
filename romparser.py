@@ -2,30 +2,42 @@
 
 import sys
 
-# lot of structure, little code!
-
 def parse(roman):
     """Parses roman numeral to arabic number."""
-    # Creating finite automata to parse slices of the roman numeral.
-    # All created automata have the same structure.  Each returns an
-    # integer of what has successfully been parsed, and the remaining
-    # slice.
+    
+    # Creating finite automata to parse slices of the given roman
+    # numeral. One automata for parsing numbers from 'I' to 'IX' (the
+    # 1st position), one for the 2nd position, and so forth.  Each
+    # automaton returns a tuple of the number that has successfully
+    # been parsed, and the remaining, unparsed slice.
+    
     max, remainder = MMM().parse(roman)
     hi, remainder  = CDM().parse(remainder)
     mid, remainder = XLC().parse(remainder)
     low, remainder = IVX().parse(remainder)
+    
     assert(remainder == "") # TODO - raise parse error!
+    
     return max+hi+mid+low
         
 
 class AbstractRomParser(object):
+    """Abstract finite automaton for parsing roman numerals."""
 
     def __init__(self, i, v, x, mul):
         """Where i is one of 'I', 'X', 'C', v is one of 'V', 'L', or
         'D', and x may be 'X', 'C', or 'M'."""
+
+        # For simplicity, variables are called I,V,X, although X,L,C,
+        # and C,D,M can be used equivalently.
         I = mul
         V = 5 * mul
         X = 10 * mul
+
+        # Adjacency list, describing a finite automaton to parse roman
+        # numerals.  Each list item represents a dfa-state with a
+        # dictionary of transitions, where each key maps to a tuple of
+        # a successor state and a summand.
         self.adjacencies = [
             # state 0            # ack 0
             { i : (1, +I),       # -> I, II, III, IV, IX
@@ -54,16 +66,24 @@ class AbstractRomParser(object):
             ]
 
     def parse(self, roman):
-        state = 0
-        result = 0
-        index = 0
+        """Takes string representation of a roman numeral.  Returns
+        tuple of the successfully parsed number (possibly 0), and the
+        remaining, unparsed string."""
+
+        state = 0    # start state
+        result = 0   # sum
+        index = 0    # start of unparsed slice
+
+        # Following transitions for each character in roman numeral,
+        # while applying the mapped increment to sum.
         for c in roman:
             if not c in self.adjacencies[state]:
+                # There was not transition for the given character.
                 break
-            next_state, k = self.adjacencies[state][c]
-            state = next_state
+            state, k = self.adjacencies[state][c]
             result += k
             index += 1
+            
         return result, roman[index:]
     
 
