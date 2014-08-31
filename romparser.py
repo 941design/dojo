@@ -41,28 +41,24 @@ class AbstractRomParser(object):
         self.adjacencies = [
             # state 0            # ack 0
             { i : (1, +I),       # -> I, II, III, IV, IX
-              v : (2, +V),       # -> V, VI, VII, VIII
+              v : (3, +V),       # -> V, VI, VII, VIII
               },
             # state 1            # ack I
-            { x : (3, -I-I+X),   # -> IX
-              i : (4, +I),       # -> II, III
+            { x : (5, -I-I+X),   # -> IX
+              i : (2, +I),       # -> II, III
               v : (5, -I-I+V)    # -> IV
               },
-            # state 2            # ack V
-            { i : (7, +I)        # -> VI, VII, VIII
+            # state 2            # ack II
+            { i : (5, +I)        # -> III
               },
-            # state 3            # ack IX
+            # state 3            # ack V
+            { i : (4, +I)        # -> VI, VII, VIII
+              },
+            # state 4            # ack VII
+            { i : (2, +I)        # -> VIII
+              },
+            # state 5            # ack III, IV, VIII, IX
             { }, 
-            # state 4            # ack II
-            { i : (6, +I)        # -> III
-              },
-            # state 5            # ack IV
-            { },                 
-            # state 6            # ack III, VIII
-            { },                 
-            # state 7            # ack VII
-            { i : (4, +I)        # -> VIII
-              },
             ]
 
     def parse(self, roman):
