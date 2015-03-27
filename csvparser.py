@@ -109,6 +109,7 @@ class IncrementalTablePrinter(AbstractTablePrinter):
     PREV_PAGE = "p"
     FIRST_PAGE = "f"
     LAST_PAGE = "l"
+    JUMP_TO_PAGE = "j"
     EXIT = "x"
 
     def __init__(self, pageSize, rows):
@@ -122,14 +123,20 @@ class IncrementalTablePrinter(AbstractTablePrinter):
     def print(self, userAction=NEXT_PAGE):
         while userAction != self.EXIT:
             if userAction == self.NEXT_PAGE:
-                self._printNextPage()
+                if self.row_index == self.size():
+                    self._printLastPage()
+                else:
+                    self._printNextPage()
             elif userAction == self.PREV_PAGE:
                 self._printPreviousPage()
             elif userAction == self.FIRST_PAGE:
                 self._printFirstPage()
             elif userAction == self.LAST_PAGE:
                 self._printLastPage()
-            userAction = self.getUserAction()
+            elif userAction == self.JUMP_TO_PAGE:
+                pageIndex = self._getPageNumber()
+                self._jumpToPage(pageIndex)
+            userAction = self._getUserAction()
 
     def _printFirstPage(self):
         start = 0
@@ -152,13 +159,30 @@ class IncrementalTablePrinter(AbstractTablePrinter):
         end = max(min(self.page_size, self.size()), self.row_index - self.page_size)
         self._printPage(start, end)
 
+    def _jumpToPage(self, pageIndex):
+        # Starting at 1
+        start = min(self.size(), self.page_size*(pageIndex-1))
+        end = min(self.size(), start + self.page_size)
+        self._printPage(start, end)
+
     def _printPage(self, start, end):
         self.printHeader()
         self.printRows(*self.rows[start:end])
         self.row_index = end
+        currentPage = (start + self.page_size) // self.page_size
+        amountOfPages = self.size() // self.page_size
+        print("Page " + str(currentPage) + " of " + str(amountOfPages))
 
-    def getUserAction(self):
-        return input("\nN(ext page, P(revious page, F(irst page, L(ast page, eX(it\n").lower()
+    def _getUserAction(self):
+        userAction = input("\nN(ext page, P(revious page, F(irst page, L(ast page, J(ump to page, eX(it\n").lower()
+        return userAction
+
+    def _getPageNumber(self):
+        pageNumber = input("page no.: ")
+        try:
+            return int(pageNumber)
+        except ValueError:
+            return self._getPageNumber()
 
 
 if __name__ == "__main__":
