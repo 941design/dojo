@@ -102,14 +102,74 @@ class DefaultTablePrinter(AbstractTablePrinter):
         self.printRows(*self.rows)
 
 
+class IncrementalTablePrinter(AbstractTablePrinter):
+    """Prints table incrementally."""
+
+    NEXT_PAGE = "n"
+    PREV_PAGE = "p"
+    FIRST_PAGE = "f"
+    LAST_PAGE = "l"
+    EXIT = "x"
+
+    def __init__(self, pageSize, rows):
+        super().__init__(rows)
+        self.page_size = pageSize
+        self.row_index = 0
+
+    def size(self):
+        return len(self.rows)
+
+    def print(self, userAction=NEXT_PAGE):
+        while userAction != self.EXIT:
+            if userAction == self.NEXT_PAGE:
+                self._printNextPage()
+            elif userAction == self.PREV_PAGE:
+                self._printPreviousPage()
+            elif userAction == self.FIRST_PAGE:
+                self._printFirstPage()
+            elif userAction == self.LAST_PAGE:
+                self._printLastPage()
+            userAction = self.getUserAction()
+
+    def _printFirstPage(self):
+        start = 0
+        end = min(self.size(), self.page_size)
+        self._printPage(start, end) 
+
+    def _printLastPage(self):
+        start = max(0, self.size() - self.page_size)
+        end = self.size()
+        self._printPage(start, end)
+
+    def _printNextPage(self):
+        start = self.row_index
+        end = min(self.size(), self.row_index + self.page_size)
+        self._printPage(start, end)
+
+    def _printPreviousPage(self):
+        # Must rewind two pages, in order to really skip the currently showing page
+        start = max(0, self.row_index - 2*self.page_size)
+        end = max(min(self.page_size, self.size()), self.row_index - self.page_size)
+        self._printPage(start, end)
+
+    def _printPage(self, start, end):
+        self.printHeader()
+        self.printRows(*self.rows[start:end])
+        self.row_index = end
+
+    def getUserAction(self):
+        return input("\nN(ext page, P(revious page, F(irst page, L(ast page, eX(it\n").lower()
+
+
 if __name__ == "__main__":
     
     if len(sys.argv) != 2:
         print("provide .csv file argument")
         sys.exit(1)
         
+    PAGE_SIZE = 4
     csv = open(sys.argv[1])
     rows = parse(csv)
     # validateTable(rows)
-    printer = DefaultTablePrinter(rows)
+    printer = IncrementalTablePrinter(PAGE_SIZE, rows)
     printer.print()
