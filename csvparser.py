@@ -71,29 +71,35 @@ def parse(csv):
             pass
     return rows
 
+class AbstractTablePrinter(object):
 
-def printTable(rows):
-    row_widths = rowWidths(rows)
-    row_format = "|" + "|".join(" {:" +str(i) + "} " for i in row_widths) + "|"
-    sep_format = "+-" + "-+-".join("-" * i for i in row_widths) + "-+"
-    printHeader(rows[0], row_format, sep_format)
-    printRows(rows[1:], row_format)
+    def __init__(self, rows):
+        self.header = rows[0]
+        self.rows = rows[1:]
+        row_widths = self._rowWidths(rows)
+        self.row_format = "|" + "|".join(" {:" +str(i) + "} " for i in row_widths) + "|"
+        self.sep_format = "+-" + "-+-".join("-" * i for i in row_widths) + "-+"
+
+    def _rowWidths(self, rows):
+        increment_max = lambda maxs, xs: [max(x, len(y)) for x,y in zip(maxs, xs)]
+        max_widths = reduce(increment_max, rows, repeat(0))
+        return max_widths
+
+    def printHeader(self):
+        self.printRows(self.header)
+        print(self.sep_format)
+
+    def printRows(self, *rows):
+        for row in rows:
+            print(self.row_format.format(*row))
 
 
-def rowWidths(rows):
-    increment_max = lambda maxs, xs: [max(x, len(y)) for x,y in zip(maxs, xs)]
-    max_widths = reduce(increment_max, rows, repeat(0))
-    return max_widths
+class DefaultTablePrinter(AbstractTablePrinter):
+    """Prints entire table in one batch."""
 
-
-def printHeader(header, row_format, sep_format):
-    print(row_format.format(*header))
-    print(sep_format)
-
-
-def printRows(rows, row_format):
-    for row in rows:
-        print(row_format.format(*row))
+    def print(self):
+        self.printHeader()
+        self.printRows(*self.rows)
 
 
 if __name__ == "__main__":
@@ -105,4 +111,5 @@ if __name__ == "__main__":
     csv = open(sys.argv[1])
     rows = parse(csv)
     # validateTable(rows)
-    printTable(rows)
+    printer = DefaultTablePrinter(rows)
+    printer.print()
