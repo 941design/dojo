@@ -1,7 +1,9 @@
 package de.markusrother.automata;
 
 import static de.markusrother.automata.AutomatonStateMatcher.isState;
+import static de.markusrother.automata.AutomatonTransitionMatcher.isTransition;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,8 +19,9 @@ import de.markusrother.automata.exceptions.NoSuchStateException;
 
 public class DeterministicFiniteAutomatonTest {
 
-	private static final String S1 = "s1";
-	private static final String S2 = "s2";
+	private static final String S1 = "S1";
+	private static final String S2 = "S2";
+	private static final String S3 = "S3";
 	private static final Object TOKEN = new Object();
 
 	private DeterministicFiniteAutomaton<Object> dfa;
@@ -30,7 +33,7 @@ public class DeterministicFiniteAutomatonTest {
 
 	@Test
 	public void testNewAutomatonHasNoStates() throws Exception {
-		assertAmountOfStates(0);
+		Assert.assertThat(dfa.getStates(), empty());
 	}
 
 	@Test(expected = NoStartStateException.class)
@@ -40,12 +43,12 @@ public class DeterministicFiniteAutomatonTest {
 
 	@Test
 	public void testNewAutomatonHasNoAcceptingStates() throws Exception {
-		assertAmountOfAcceptingStates(0);
+		Assert.assertThat(dfa.getAcceptingStates(), empty());
 	}
 
 	@Test
 	public void testNewAutomatonHasNoTransitions() throws Exception {
-		assertAmountOfTransitions(0);
+		Assert.assertThat(dfa.getTransitions(), empty());
 	}
 
 	@Test
@@ -59,7 +62,7 @@ public class DeterministicFiniteAutomatonTest {
 	@Test
 	public void testCreateState() throws Exception {
 		dfa.createStates(S1);
-		assertAmountOfStates(1);
+		Assert.assertThat(dfa.getStates(), contains(isState(S1)));
 	}
 
 	@Test(expected = DuplicateStateException.class)
@@ -84,7 +87,6 @@ public class DeterministicFiniteAutomatonTest {
 	public void testCreateAcceptingState() throws Exception {
 		dfa.createStates(S1)
 			.addAcceptingStates(S1);
-		assertAmountOfAcceptingStates(1);
 		Assert.assertThat(dfa.getAcceptingStates(), contains(isState(S1)));
 	}
 
@@ -97,7 +99,7 @@ public class DeterministicFiniteAutomatonTest {
 	public void testCreateTransition() throws Exception {
 		dfa.createStates(S1, S2)
 			.createTransition(S1, S2, TOKEN);
-		assertAmountOfTransitions(1);
+		Assert.assertThat(dfa.getTransitions(), contains(isTransition(S1, S2, TOKEN)));
 	}
 
 	@Test(expected = DuplicateTransitionException.class)
@@ -199,25 +201,61 @@ public class DeterministicFiniteAutomatonTest {
 		assertRejects(0, 1, 0, 1, 0);
 	}
 
+	@Test
+	public void testCopyNotIdentical() throws Exception {
+		final DeterministicFiniteAutomaton<Object> copy = dfa.copy();
+		Assert.assertTrue(copy != dfa);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testCopyStatesInto() throws Exception {
+		dfa.createStates(S1, S2);
+		final DeterministicFiniteAutomaton<Object> copy = dfa.copy();
+		Assert.assertThat(copy.getStates(), contains(isState(S1), isState(S2)));
+	}
+
+	@Test
+	public void testCopyStartState() throws Exception {
+		dfa.createStates(S1)
+			.setStartState(S1);
+		final DeterministicFiniteAutomaton<Object> copy = dfa.copy();
+		Assert.assertThat(copy.getStartState(), isState(S1));
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testCopyAcceptingStates() throws Exception {
+		dfa.createStates(S1, S2, S3)
+			.addAcceptingStates(S2, S3);
+		final DeterministicFiniteAutomaton<Object> copy = dfa.copy();
+		Assert.assertThat(copy.getAcceptingStates(), contains(isState(S2), isState(S3)));
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testCopyTransitions() throws Exception {
+		dfa.createStates(S1, S2)
+			.createTransition(S1, S2, TOKEN)
+			.createTransition(S2, S2, TOKEN);
+		final DeterministicFiniteAutomaton<Object> copy = dfa.copy();
+		Assert.assertThat(copy.getTransitions(), contains(isTransition(S1, S2, TOKEN), isTransition(S2, S2, TOKEN)));
+	}
+
+	@Test
+	public void testCopyCircularAutomaton() throws Exception {
+		dfa.createStates(S1)
+			.createTransition(S1, S1, TOKEN);
+		final DeterministicFiniteAutomaton<Object> copy = dfa.copy();
+		Assert.assertThat(copy.getTransitions(), contains(isTransition(S1, S1, TOKEN)));
+	}
+
 	private void assertAccepts(Object... tokens) throws NoStartStateException {
 		Assert.assertTrue(dfa.accepts(Arrays.asList(tokens)));
 	}
 
 	private void assertRejects(Object... tokens) throws NoStartStateException {
 		Assert.assertFalse(dfa.accepts(Arrays.asList(tokens)));
-	}
-
-	private void assertAmountOfStates(int amountOfStates) {
-		Assert.assertEquals(amountOfStates, dfa.getStates().size());
-	}
-
-	private void assertAmountOfAcceptingStates(int amountOfAcceptingStates) {
-		Assert.assertEquals(amountOfAcceptingStates, dfa.getAcceptingStates()
-														.size());
-	}
-
-	private void assertAmountOfTransitions(int amountOfTransitions) {
-		Assert.assertEquals(amountOfTransitions, dfa.getTransitions().size());
 	}
 
 }

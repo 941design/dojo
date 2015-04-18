@@ -170,4 +170,42 @@ public class DeterministicFiniteAutomaton<T> implements TransitionFunction<T> {
 		return runner.isAccepting();
 	}
 
+	public DeterministicFiniteAutomaton<T> copy() {
+		try {
+			final DeterministicFiniteAutomaton<T> copy = new DeterministicFiniteAutomaton<T>();
+			copyStatesInto(copy);
+			copyTransitionsInto(copy);
+			return copy;
+		}
+		catch (NoSuchStateException | DuplicateStateException | DuplicateTransitionException e) {
+			throw new IllegalStateException(e);
+		}
+	}
+
+	private void copyStatesInto(final DeterministicFiniteAutomaton<T> copy) throws NoSuchStateException,
+			DuplicateStateException {
+		for (AutomatonState state : states) {
+			final String stateLabel = state.getLabel();
+			copy.createState(stateLabel);
+			// Not based on getAcceptingStates() for slightly better performance:
+			if (state.isAccepting()) {
+				copy.addAcceptingState(stateLabel);
+			}
+		}
+		if (hasStartState()) {
+			String startStateLabel = startState.getLabel();
+			copy.setStartState(startStateLabel);
+		}
+	}
+
+	private void copyTransitionsInto(DeterministicFiniteAutomaton<T> copy) throws NoSuchStateException,
+			DuplicateTransitionException {
+		for (AutomatonTransition<T> transition :transitions) {
+			final String originLabel = transition.getOriginLabel();
+			final String targetLabel = transition.getTargetLabel();
+			final T token = transition.getToken();
+			copy.createTransition(originLabel, targetLabel, token);
+		}
+	}
+
 }

@@ -23,8 +23,7 @@ public class AutomatonStateMatcher extends BaseMatcher<AutomatonState> {
 
 	@Override
 	public void describeTo(Description description) {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO");
+		description.appendValue(label);
 	}
 
 }

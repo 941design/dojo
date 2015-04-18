@@ -24,4 +24,12 @@ class AutomatonTransition<T> {
 		return token;
 	}
 
+	public String getOriginLabel() {
+		return origin.getLabel();
+	}
+
+	public String getTargetLabel() {
+		return target.getLabel();
+	}
+
 }
