@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class DeterministicAutomatonComparator<T> {
+public class DeterministicFiniteAutomatonComparator<T> {
 
 	private final DeterministicFiniteAutomaton<T> that;
 	private final DeterministicFiniteAutomaton<T> other;
@@ -15,18 +15,22 @@ public class DeterministicAutomatonComparator<T> {
 
 	@SuppressWarnings("unchecked")
 	public static <U> boolean areEqual(DeterministicFiniteAutomaton<U> that, DeterministicFiniteAutomaton<?> other) {
+		if (!that.hasStartState() && !other.hasStartState()) {
+			// By definition all automata without start states are equal!
+			return true;
+		}
 		final Collection<U> thatAlphabet = that.getAlphabet();
 		final Collection<?> otherAlphabet = other.getAlphabet();
 		if (!thatAlphabet.containsAll(otherAlphabet) || !otherAlphabet.containsAll(thatAlphabet)) {
 			return false;
 		}
 		// We can now safely cast, because alphabets are equal and alphabets define an automaton's generic type.
-		final DeterministicAutomatonComparator<U> comparator =
-				new DeterministicAutomatonComparator<>(that, (DeterministicFiniteAutomaton<U>) other);
+		final DeterministicFiniteAutomatonComparator<U> comparator =
+				new DeterministicFiniteAutomatonComparator<>(that, (DeterministicFiniteAutomaton<U>) other);
 		return comparator.areEqual();
 	}
 
-	private DeterministicAutomatonComparator(DeterministicFiniteAutomaton<T> that, DeterministicFiniteAutomaton<T> other) {
+	private DeterministicFiniteAutomatonComparator(DeterministicFiniteAutomaton<T> that, DeterministicFiniteAutomaton<T> other) {
 		this.that = that;
 		this.other = other;
 		this.alphabet = new ArrayList<>(that.getAlphabet());
@@ -42,6 +46,12 @@ public class DeterministicAutomatonComparator<T> {
 	}
 
 	private boolean areEqual(AutomatonState thatState, AutomatonState otherState) {
+		if ((thatState == null) != (otherState == null)) {
+			return false;
+		}
+		if (thatState.isAccepting() != otherState.isAccepting()) {
+			return false;
+		}
 		for (T token : alphabet) {
 			final AutomatonTransition<T> thatTransition = that.getTransition(thatState, token);
 			final AutomatonTransition<T> otherTransition = other.getTransition(otherState, token);

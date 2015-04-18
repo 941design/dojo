@@ -6,7 +6,11 @@ package de.markusrother.automata;
  */
 class NullState implements AutomatonState {
 
-	public static final NullState INSTANCE = new NullState();
+	private static final NullState INSTANCE = new NullState();
+
+	public static AutomatonState getInstance() {
+		return INSTANCE;
+	}
 
 	@Override
 	public boolean isAccepting() {

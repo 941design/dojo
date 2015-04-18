@@ -79,7 +79,17 @@ public class DeterministicFiniteAutomaton<T> implements TransitionFunction<T> {
 	 * @see {@link de.markusrother.automata.NullState}
 	 */
 	private AutomatonState getNullState() {
-		return NullState.INSTANCE;
+		return NullState.getInstance();
+	}
+
+	/**
+	 * @return A {@link de.markusrother.automata.AutomatonTransition} leading to a
+	 *         {@link de.markusrother.automata.NullState}.
+	 *
+	 * @see {@link de.markusrother.automata.NullState}
+	 */
+	private AutomatonTransition<T> getNullTransition() {
+		return NullTransition.getInstance();
 	}
 
 	public boolean hasStartState() {
@@ -120,6 +130,9 @@ public class DeterministicFiniteAutomaton<T> implements TransitionFunction<T> {
 
 	@Override
 	public AutomatonState getSuccessor(AutomatonState predecessor, T token) {
+		if (predecessor == null) {
+			throw new IllegalArgumentException();
+		}
 		final AutomatonTransition<T> transition = getTransition(predecessor, token);
 		return transition == null ? getNullState() : transition.getTarget();
 	}
@@ -134,7 +147,7 @@ public class DeterministicFiniteAutomaton<T> implements TransitionFunction<T> {
 		if (hasTransition(origin, target, token)) {
 			throw new DuplicateTransitionException(originLabel, targetLabel, token);
 		}
-		final AutomatonTransition<T> transition = new AutomatonTransition<T>(origin, target, token);
+		final AutomatonTransition<T> transition = new AutomatonTransitionImpl<T>(origin, target, token);
 		transitions.add(transition);
 		alphabet.add(token);
 		return this;
@@ -163,12 +176,15 @@ public class DeterministicFiniteAutomaton<T> implements TransitionFunction<T> {
 	}
 
 	AutomatonTransition<T> getTransition(AutomatonState origin, T token) {
+		if (origin == null) {
+			throw new IllegalArgumentException();
+		}
 		for (AutomatonTransition<T> transition : transitions) {
 			if (transition.getOrigin().equals(origin) && transition.getToken().equals(token)) {
 				return transition;
 			}
 		}
-		return null;
+		return getNullTransition();
 	}
 
 	public boolean accepts(Iterable<T> tokens) throws NoStartStateException {
@@ -226,7 +242,7 @@ public class DeterministicFiniteAutomaton<T> implements TransitionFunction<T> {
 			return false;
 		}
 		final DeterministicFiniteAutomaton<?> other = (DeterministicFiniteAutomaton<?>) obj;
-		return DeterministicAutomatonComparator.areEqual(this, other);
+		return DeterministicFiniteAutomatonComparator.areEqual(this, other);
 	}
 
 }
