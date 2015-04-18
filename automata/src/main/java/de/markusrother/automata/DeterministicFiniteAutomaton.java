@@ -1,6 +1,7 @@
 package de.markusrother.automata;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 
 import de.markusrother.automata.exceptions.DuplicateStateException;
@@ -14,11 +15,18 @@ public class DeterministicFiniteAutomaton<T> implements TransitionFunction<T> {
 
 	private final Collection<AutomatonTransition<T>> transitions;
 
+	private final Collection<T> alphabet;
+
 	private AutomatonState startState;
 
 	public DeterministicFiniteAutomaton() {
 		states = new LinkedList<>();
 		transitions = new LinkedList<>();
+		alphabet = new HashSet<>();
+	}
+
+	public Collection<T> getAlphabet() {
+		return alphabet;
 	}
 
 	public DeterministicFiniteAutomaton<T> createStates(String... labels) throws DuplicateStateException {
@@ -128,6 +136,7 @@ public class DeterministicFiniteAutomaton<T> implements TransitionFunction<T> {
 		}
 		final AutomatonTransition<T> transition = new AutomatonTransition<T>(origin, target, token);
 		transitions.add(transition);
+		alphabet.add(token);
 		return this;
 	}
 
@@ -149,11 +158,11 @@ public class DeterministicFiniteAutomaton<T> implements TransitionFunction<T> {
 		return null;
 	}
 
-	public Collection<AutomatonTransition<T>> getTransitions() {
+	Collection<AutomatonTransition<T>> getTransitions() {
 		return transitions;
 	}
 
-	private AutomatonTransition<T> getTransition(AutomatonState origin, T token) {
+	AutomatonTransition<T> getTransition(AutomatonState origin, T token) {
 		for (AutomatonTransition<T> transition : transitions) {
 			if (transition.getOrigin().equals(origin) && transition.getToken().equals(token)) {
 				return transition;
@@ -206,6 +215,18 @@ public class DeterministicFiniteAutomaton<T> implements TransitionFunction<T> {
 			final T token = transition.getToken();
 			copy.createTransition(originLabel, targetLabel, token);
 		}
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
+		final DeterministicFiniteAutomaton<?> other = (DeterministicFiniteAutomaton<?>) obj;
+		return DeterministicAutomatonComparator.areEqual(this, other);
 	}
 
 }
