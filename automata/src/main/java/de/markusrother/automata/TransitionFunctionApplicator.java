@@ -1,11 +1,8 @@
 package de.markusrother.automata;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
-
-import de.markusrother.automata.exceptions.NoStartStateException;
 
 /**
  * Stateful object for executing a {@link de.markusrother.automata.TransitionFunction} for a given input.
@@ -14,24 +11,16 @@ import de.markusrother.automata.exceptions.NoStartStateException;
  */
 class TransitionFunctionApplicator<T> implements Iterator<Collection<AutomatonState>> {
 
-	static <U> TransitionFunctionApplicator<U> create(FiniteAutomaton<U> automaton, Iterable<U> tokens)
-			throws NoStartStateException {
-		if (!automaton.hasStartState()) {
-			throw new NoStartStateException();
-		}
-		return new TransitionFunctionApplicator<U>(automaton, automaton.getStartState(), tokens.iterator());
-	}
-
 	private final TransitionFunction<T> transitionFunction;
 	private final Iterator<T> tokens;
 
 	private Collection<AutomatonState> currentStates;
 
-	private TransitionFunctionApplicator(TransitionFunction<T> transitionFunction, AutomatonState startState,
-			Iterator<T> tokens) {
+	TransitionFunctionApplicator(TransitionFunction<T> transitionFunction, Collection<AutomatonState> startStates,
+			Iterable<T> tokens) {
 		this.transitionFunction = transitionFunction;
-		this.currentStates = Arrays.asList(startState);
-		this.tokens = tokens;
+		this.currentStates = startStates;
+		this.tokens = tokens.iterator();
 	}
 
 	@Override

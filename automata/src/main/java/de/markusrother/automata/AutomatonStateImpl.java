@@ -30,4 +30,9 @@ class AutomatonStateImpl implements AutomatonState {
 		return accepting;
 	}
 
+	@Override
+	public String toString() {
+		return label;
+	}
+
 }

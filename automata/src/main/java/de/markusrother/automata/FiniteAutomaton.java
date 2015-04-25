@@ -7,6 +7,9 @@ import de.markusrother.automata.exceptions.DuplicateTransitionException;
 import de.markusrother.automata.exceptions.NoStartStateException;
 import de.markusrother.automata.exceptions.NoSuchStateException;
 
+/**
+ * TODO - This interface could be narrowed down substantially...
+ */
 public interface FiniteAutomaton<T> extends TransitionFunction<T> {
 
 	/**
@@ -17,6 +20,8 @@ public interface FiniteAutomaton<T> extends TransitionFunction<T> {
 	FiniteAutomaton<T> createStates(String... stateLabels) throws DuplicateStateException;
 
 	Collection<AutomatonState> getStates();
+
+	AutomatonState getState(String label);
 
 	AutomatonState getStartState();
 
@@ -29,6 +34,10 @@ public interface FiniteAutomaton<T> extends TransitionFunction<T> {
 	Collection<AutomatonState> getAcceptingStates();
 
 	FiniteAutomaton<T> createTransition(String originLabel, String targetLabel, T token) throws NoSuchStateException,
+			DuplicateTransitionException;
+
+	// FIXME - Create subinterface
+	FiniteAutomaton<T> createEmptyTransition(String originLabel, String targetLabel) throws NoSuchStateException,
 			DuplicateTransitionException;
 
 	/**

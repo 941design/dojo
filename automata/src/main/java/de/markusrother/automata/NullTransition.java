@@ -19,8 +19,15 @@ class NullTransition<T> implements AutomatonTransition<T> {
 		return NullState.getInstance();
 	}
 
+	@SuppressWarnings("unused")
 	@Override
-	public T getToken() {
+	public boolean hasOrigin(AutomatonState state) {
+		throw new UnsupportedOperationException();
+	}
+
+	@SuppressWarnings("unused")
+	@Override
+	public boolean hasTarget(AutomatonState state) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -32,6 +39,34 @@ class NullTransition<T> implements AutomatonTransition<T> {
 	@Override
 	public String getTargetLabel() {
 		return getTarget().getLabel();
+	}
+
+	@SuppressWarnings("unused")
+	@Override
+	public boolean hasOriginLabel(String originLabel) {
+		throw new UnsupportedOperationException();
+	}
+
+	@SuppressWarnings("unused")
+	@Override
+	public boolean hasTargetLabel(String targetLabel) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public T getToken() {
+		throw new UnsupportedOperationException();
+	}
+
+	@SuppressWarnings("unused")
+	@Override
+	public boolean hasToken(T token) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return false;
 	}
 
 }

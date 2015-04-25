@@ -23,9 +23,9 @@ public class AutomatonTransitionMatcher<T> extends BaseMatcher<AutomatonTransiti
 	@Override
 	public boolean matches(Object item) {
 		final AutomatonTransition<T> transition = (AutomatonTransition<T>) item;
-		return originLabel.equals(transition.getOriginLabel()) //
-				&& targetLabel.equals(transition.getTargetLabel()) //
-				&& token.equals(transition.getToken());
+		return transition.hasOriginLabel(originLabel) //
+				&& transition.hasTargetLabel(targetLabel) //
+				&& transition.hasToken(token);
 	}
 
 	@Override

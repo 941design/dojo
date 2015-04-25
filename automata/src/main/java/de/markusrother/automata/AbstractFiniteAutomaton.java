@@ -1,14 +1,11 @@
 package de.markusrother.automata;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 
 import de.markusrother.automata.exceptions.DuplicateStateException;
 import de.markusrother.automata.exceptions.DuplicateTransitionException;
-import de.markusrother.automata.exceptions.NoStartStateException;
 import de.markusrother.automata.exceptions.NoSuchStateException;
 
 public abstract class AbstractFiniteAutomaton<T> implements FiniteAutomaton<T> {
@@ -55,11 +52,8 @@ public abstract class AbstractFiniteAutomaton<T> implements FiniteAutomaton<T> {
 		return getState(label) != null;
 	}
 
-	/**
-	 * It is more convenient to throw an Exception here. However, if this method is made public, it should return null
-	 * instead!
-	 */
-	private AutomatonState getState(String label) {
+	@Override
+	public AutomatonState getState(String label) {
 		for (AutomatonState state : states) {
 			if (state.hasLabel(label)) {
 				return state;
@@ -68,7 +62,7 @@ public abstract class AbstractFiniteAutomaton<T> implements FiniteAutomaton<T> {
 		return null;
 	}
 
-	private AutomatonState getExistingState(String label) throws NoSuchStateException {
+	protected AutomatonState getExistingState(String label) throws NoSuchStateException {
 		final AutomatonState state = getState(label);
 		if (state != null) {
 			return state;
@@ -82,7 +76,7 @@ public abstract class AbstractFiniteAutomaton<T> implements FiniteAutomaton<T> {
 	 * @see {@link de.markusrother.automata.NullState}
 	 * @see {@link de.markusrother.automata.NullTransition}
 	 */
-	private AutomatonState getNullState() {
+	protected AutomatonState getNullState() {
 		return NullState.getInstance();
 	}
 
@@ -145,16 +139,6 @@ public abstract class AbstractFiniteAutomaton<T> implements FiniteAutomaton<T> {
 	}
 
 	@Override
-	public Collection<AutomatonState> getSuccessors(AutomatonState predecessor, T token) {
-		if (predecessor == null) {
-			throw new IllegalArgumentException();
-		}
-		final AutomatonTransition<T> transition = getTransition(predecessor, token);
-		final AutomatonState successor = transition == null ? getNullState() : transition.getTarget();
-		return Collections.unmodifiableCollection(Arrays.asList(successor));
-	}
-
-	@Override
 	public FiniteAutomaton<T> createTransition(String originLabel, String targetLabel, T token)
 			throws NoSuchStateException, DuplicateTransitionException {
 		if (token == null) {
@@ -166,9 +150,13 @@ public abstract class AbstractFiniteAutomaton<T> implements FiniteAutomaton<T> {
 			throw new DuplicateTransitionException(originLabel, targetLabel, token);
 		}
 		final AutomatonTransition<T> transition = new AutomatonTransitionImpl<T>(origin, target, token);
-		transitions.add(transition);
+		addTransition(transition);
 		alphabet.add(token);
 		return this;
+	}
+
+	protected void addTransition(final AutomatonTransition<T> transition) {
+		transitions.add(transition);
 	}
 
 	private boolean hasTransition(AutomatonState origin, AutomatonState target, T token) {
@@ -177,12 +165,7 @@ public abstract class AbstractFiniteAutomaton<T> implements FiniteAutomaton<T> {
 
 	private AutomatonTransition<T> getTransition(AutomatonState origin, AutomatonState target, T token) {
 		for (AutomatonTransition<T> transition : transitions) {
-			final AutomatonState transitionOrigin = transition.getOrigin();
-			final AutomatonState transitionTarget = transition.getTarget();
-			final Object transitionToken = transition.getToken();
-			if (transitionOrigin.equals(origin)
-					&& transitionTarget.equals(target)
-					&& transitionToken.equals(token)) {
+			if (transition.hasOrigin(origin) && transition.hasTarget(target) && transition.hasToken(token)) {
 				return transition;
 			}
 		}
@@ -200,22 +183,11 @@ public abstract class AbstractFiniteAutomaton<T> implements FiniteAutomaton<T> {
 			throw new IllegalArgumentException();
 		}
 		for (AutomatonTransition<T> transition : transitions) {
-			if (transition.getOrigin()
-							.equals(origin) && transition.getToken()
-															.equals(token)) {
+			if (transition.hasOrigin(origin) && transition.hasToken(token)) {
 				return transition;
 			}
 		}
 		return getNullTransition();
-	}
-
-	@Override
-	public boolean accepts(Iterable<T> tokens) throws NoStartStateException {
-		final TransitionFunctionApplicator<T> runner = TransitionFunctionApplicator.create(this, tokens);
-		while (runner.hasNext()) {
-			runner.next();
-		}
-		return runner.isAccepting();
 	}
 
 	protected FiniteAutomaton<T> copyInto(AbstractFiniteAutomaton<T> copy) {

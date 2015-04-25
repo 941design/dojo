@@ -8,6 +8,7 @@ import static org.hamcrest.Matchers.is;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -22,6 +23,7 @@ public abstract class AbstractFiniteAutomatonTest {
 	protected static final String S1 = "S1";
 	protected static final String S2 = "S2";
 	protected static final String S3 = "S3";
+	protected static final String S4 = "S4";
 	protected static final String T1 = "T1";
 	protected static final String T2 = "T2";
 	protected static final Object TOKEN = new Object();
@@ -409,11 +411,22 @@ public abstract class AbstractFiniteAutomatonTest {
 		Assert.assertEquals(automaton, other);
 	}
 
-	private void assertAccepts(Object... tokens) throws NoStartStateException {
+	@Test
+	public void testTokensNotCopied() throws Exception {
+		automaton.createStates(S1, S2)
+					.createTransition(S1, S2, TOKEN);
+		final FiniteAutomaton<Object> copy = automaton.copy();
+		final Collection<Object> alphabet = copy.getAlphabet();
+		Assert.assertThat(alphabet, contains(TOKEN));
+		Assert.assertTrue(alphabet.iterator()
+									.next() == TOKEN);
+	}
+
+	protected void assertAccepts(Object... tokens) throws NoStartStateException {
 		Assert.assertTrue(automaton.accepts(Arrays.asList(tokens)));
 	}
 
-	private void assertRejects(Object... tokens) throws NoStartStateException {
+	protected void assertRejects(Object... tokens) throws NoStartStateException {
 		Assert.assertFalse(automaton.accepts(Arrays.asList(tokens)));
 	}
 

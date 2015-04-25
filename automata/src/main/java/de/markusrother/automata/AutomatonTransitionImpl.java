@@ -1,25 +1,12 @@
 package de.markusrother.automata;
 
-class AutomatonTransitionImpl<T> implements AutomatonTransition<T> {
+class AutomatonTransitionImpl<T> extends AbstractAutomatonTransitionImpl<T> {
 
-	private final AutomatonState origin;
-	private final AutomatonState target;
 	private final T token;
 
 	AutomatonTransitionImpl(AutomatonState origin, AutomatonState target, T token) {
-		this.origin = origin;
-		this.target = target;
+		super(origin, target);
 		this.token = token;
-	}
-
-	@Override
-	public AutomatonState getOrigin() {
-		return origin;
-	}
-
-	@Override
-	public AutomatonState getTarget() {
-		return target;
 	}
 
 	@Override
@@ -28,13 +15,18 @@ class AutomatonTransitionImpl<T> implements AutomatonTransition<T> {
 	}
 
 	@Override
-	public String getOriginLabel() {
-		return origin.getLabel();
+	public boolean hasToken(T token) {
+		return this.token.equals(token);
 	}
 
 	@Override
-	public String getTargetLabel() {
-		return target.getLabel();
+	public boolean isEmpty() {
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return getOriginLabel() + "-(" + token + ")->" + getTargetLabel();
 	}
 
 }
