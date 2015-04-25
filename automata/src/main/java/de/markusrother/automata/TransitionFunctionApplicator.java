@@ -1,17 +1,20 @@
 package de.markusrother.automata;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
 
 import de.markusrother.automata.exceptions.NoStartStateException;
 
 /**
  * Stateful object for executing a {@link de.markusrother.automata.TransitionFunction} for a given input.
  *
- * {@see de.markusrother.automata.DeterministicFiniteAutomaton#accepts(Iterable)}
+ * {@see de.markusrother.automata.FiniteAutomaton#accepts(Iterable)}
  */
-class TransitionFunctionApplicator<T> implements Iterator<AutomatonState> {
+class TransitionFunctionApplicator<T> implements Iterator<Collection<AutomatonState>> {
 
-	static <U> TransitionFunctionApplicator<U> create(DeterministicFiniteAutomaton<U> automaton, Iterable<U> tokens)
+	static <U> TransitionFunctionApplicator<U> create(FiniteAutomaton<U> automaton, Iterable<U> tokens)
 			throws NoStartStateException {
 		if (!automaton.hasStartState()) {
 			throw new NoStartStateException();
@@ -22,12 +25,12 @@ class TransitionFunctionApplicator<T> implements Iterator<AutomatonState> {
 	private final TransitionFunction<T> transitionFunction;
 	private final Iterator<T> tokens;
 
-	private AutomatonState currentState;
+	private Collection<AutomatonState> currentStates;
 
 	private TransitionFunctionApplicator(TransitionFunction<T> transitionFunction, AutomatonState startState,
 			Iterator<T> tokens) {
 		this.transitionFunction = transitionFunction;
-		this.currentState = startState;
+		this.currentStates = Arrays.asList(startState);
 		this.tokens = tokens;
 	}
 
@@ -37,14 +40,31 @@ class TransitionFunctionApplicator<T> implements Iterator<AutomatonState> {
 	}
 
 	@Override
-	public AutomatonState next() {
+	public Collection<AutomatonState> next() {
 		final T token = tokens.next();
-		currentState = transitionFunction.getSuccessor(currentState, token);
-		return currentState;
+		currentStates = collectSuccessors(currentStates, token);
+		return currentStates;
+	}
+
+	private Collection<AutomatonState> collectSuccessors(Collection<AutomatonState> predecessors, T token) {
+		final Collection<AutomatonState> successors = new LinkedList<>();
+		for (AutomatonState predecessor : predecessors) {
+			successors.addAll(transitionFunction.getSuccessors(predecessor, token));
+		}
+		return successors;
 	}
 
 	boolean isAccepting() {
-		return currentState.isAccepting();
+		return containsAcceptingState(currentStates);
+	}
+
+	private static boolean containsAcceptingState(Collection<AutomatonState> states) {
+		for (AutomatonState state : states) {
+			if (state.isAccepting()) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override

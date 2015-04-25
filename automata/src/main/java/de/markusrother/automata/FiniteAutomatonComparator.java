@@ -6,15 +6,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class DeterministicFiniteAutomatonComparator<T> {
+public class FiniteAutomatonComparator<T> {
 
-	private final DeterministicFiniteAutomaton<T> that;
-	private final DeterministicFiniteAutomaton<T> other;
+	private final FiniteAutomaton<T> that;
+	private final FiniteAutomaton<T> other;
 	private final List<T> alphabet;
 	private final Map<AutomatonState, AutomatonState> stateMap;
 
 	@SuppressWarnings("unchecked")
-	public static <U> boolean areEqual(DeterministicFiniteAutomaton<U> that, DeterministicFiniteAutomaton<?> other) {
+	public static <U> boolean areStructurallyEqual(FiniteAutomaton<U> that, FiniteAutomaton<?> other) {
 		if (!that.hasStartState() && !other.hasStartState()) {
 			// By definition all automata without start states are equal!
 			return true;
@@ -25,12 +25,12 @@ public class DeterministicFiniteAutomatonComparator<T> {
 			return false;
 		}
 		// We can now safely cast, because alphabets are equal and alphabets define an automaton's generic type.
-		final DeterministicFiniteAutomatonComparator<U> comparator =
-				new DeterministicFiniteAutomatonComparator<>(that, (DeterministicFiniteAutomaton<U>) other);
+		final FiniteAutomatonComparator<U> comparator =
+				new FiniteAutomatonComparator<>(that, (FiniteAutomaton<U>) other);
 		return comparator.areEqual();
 	}
 
-	private DeterministicFiniteAutomatonComparator(DeterministicFiniteAutomaton<T> that, DeterministicFiniteAutomaton<T> other) {
+	private FiniteAutomatonComparator(FiniteAutomaton<T> that, FiniteAutomaton<T> other) {
 		this.that = that;
 		this.other = other;
 		this.alphabet = new ArrayList<>(that.getAlphabet());
