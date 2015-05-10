@@ -9,7 +9,7 @@ import de.markusrother.automata.exceptions.NoStartStateException;
 import de.markusrother.automata.exceptions.NoSuchStateException;
 
 /**
- * TODO - This interface could be narrowed down substantially...
+ * @param <T> - the generic token/alphabet type.
  */
 public interface FiniteAutomaton<T> extends TransitionFunction<T> {
 
@@ -21,8 +21,6 @@ public interface FiniteAutomaton<T> extends TransitionFunction<T> {
 	FiniteAutomaton<T> createStates(String... stateLabels) throws DuplicateStateException;
 
 	Collection<AutomatonState> getStates();
-
-	AutomatonState getState(String label); // TODO - only used for tests
 
 	AutomatonState getStartState();
 
@@ -39,7 +37,6 @@ public interface FiniteAutomaton<T> extends TransitionFunction<T> {
 	FiniteAutomaton<T> createTransition(String originLabel, String targetLabel, T token) throws NoSuchStateException,
 			DuplicateTransitionException;
 
-	// FIXME - Create subinterface
 	FiniteAutomaton<T> createEmptyTransition(String originLabel, String targetLabel) throws NoSuchStateException,
 			DuplicateTransitionException;
 

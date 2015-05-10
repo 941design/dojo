@@ -7,7 +7,9 @@ import java.util.LinkedList;
 /**
  * Stateful object for executing a {@link de.markusrother.automata.TransitionFunction} for a given input.
  *
- * {@see de.markusrother.automata.FiniteAutomaton#accepts(Iterable)}
+ * @param <T> - the generic token/alphabet type.
+ *
+ * @see de.markusrother.automata.FiniteAutomaton#accepts(Iterable)
  */
 class TransitionFunctionApplicator<T> implements Iterator<Collection<AutomatonState>> {
 

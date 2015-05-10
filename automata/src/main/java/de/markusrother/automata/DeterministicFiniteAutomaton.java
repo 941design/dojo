@@ -7,6 +7,9 @@ import java.util.Collections;
 import de.markusrother.automata.exceptions.NoAcceptingStatesException;
 import de.markusrother.automata.exceptions.NoStartStateException;
 
+/**
+ * @param <T> - the generic token/alphabet type.
+ */
 public class DeterministicFiniteAutomaton<T> extends AbstractFiniteAutomaton<T> {
 
 	@Override
@@ -20,11 +23,11 @@ public class DeterministicFiniteAutomaton<T> extends AbstractFiniteAutomaton<T> 
 		throw new UnsupportedOperationException();
 	}
 
+	/**
+	 * @throws IllegalArgumentException if either parameter is null.
+	 */
 	@Override
 	public Collection<AutomatonState> getSuccessors(AutomatonState predecessor, T token) {
-		if (predecessor == null) {
-			throw new IllegalArgumentException();
-		}
 		final AutomatonTransition<T> transition = getTransition(predecessor, token);
 		final AutomatonState successor = transition == null ? getNullState() : transition.getTarget();
 		return Collections.unmodifiableCollection(Arrays.asList(successor));

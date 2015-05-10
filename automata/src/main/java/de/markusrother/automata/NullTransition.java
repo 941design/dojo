@@ -11,6 +11,7 @@ class NullTransition<T> implements AutomatonTransition<T> {
 
 	@Override
 	public AutomatonState getOrigin() {
+		// If necessary, we could instantiate null transitions once needed for each origin.
 		throw new UnsupportedOperationException();
 	}
 
@@ -22,6 +23,7 @@ class NullTransition<T> implements AutomatonTransition<T> {
 	@SuppressWarnings("unused")
 	@Override
 	public boolean hasOrigin(AutomatonState state) {
+		// If necessary, we could instantiate null transitions once needed for each origin.
 		throw new UnsupportedOperationException();
 	}
 
@@ -33,6 +35,7 @@ class NullTransition<T> implements AutomatonTransition<T> {
 
 	@Override
 	public String getOriginLabel() {
+		// If necessary, we could instantiate null transitions once needed for each origin.
 		throw new UnsupportedOperationException();
 	}
 
@@ -43,13 +46,14 @@ class NullTransition<T> implements AutomatonTransition<T> {
 
 	@SuppressWarnings("unused")
 	@Override
-	public boolean hasOriginLabel(String originLabel) {
+	public boolean hasOriginLabel(String stateLabel) {
+		// If necessary, we could instantiate null transitions once needed for each origin.
 		throw new UnsupportedOperationException();
 	}
 
 	@SuppressWarnings("unused")
 	@Override
-	public boolean hasTargetLabel(String targetLabel) {
+	public boolean hasTargetLabel(String stateLabel) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -66,7 +70,8 @@ class NullTransition<T> implements AutomatonTransition<T> {
 
 	@Override
 	public boolean isEmpty() {
-		return false;
+		// This is neither an empty, nor a non-empty transition!
+		throw new UnsupportedOperationException();
 	}
 
 }

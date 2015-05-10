@@ -10,13 +10,13 @@ import de.markusrother.automata.exceptions.NoStartStateException;
 import de.markusrother.automata.exceptions.NoSuchStateException;
 
 /**
+ * This automaton accepts the empty word if its start state has any empty transitions to an accepting state.
+ *
  * TODO - implement a list based set
  *
- * @param <T>
+ * @param <T> - the generic token/alphabet type.
  */
 public class NonDeterministicFiniteAutomaton<T> extends AbstractFiniteAutomaton<T> {
-
-	// TODO - getStartStates()
 
 	@Override
 	public FiniteAutomaton<T> createEmptyTransition(String originLabel, String targetLabel)
@@ -51,17 +51,22 @@ public class NonDeterministicFiniteAutomaton<T> extends AbstractFiniteAutomaton<
 		return copyInto(new NonDeterministicFiniteAutomaton<T>());
 	}
 
+	/**
+	 * @throws IllegalArgumentException if either parameter is null.
+	 */
 	@Override
 	public Collection<AutomatonState> getSuccessors(AutomatonState predecessor, T token) {
-		if (predecessor == null) {
-			throw new IllegalArgumentException();
-		}
 		final AutomatonTransition<T> transition = getTransition(predecessor, token);
 		final AutomatonState successor = transition == null ? getNullState() : transition.getTarget();
 		return expandState(successor);
 	}
 
-	Collection<AutomatonState> expandState(AutomatonState state) {
+	/**
+	 * @param state
+	 * @return A collection of states including the given state, and states that the given states has empty transitions
+	 *         to, recursively.
+	 */
+	private Collection<AutomatonState> expandState(AutomatonState state) {
 		final Collection<AutomatonState> visited = new LinkedList<>();
 		final Collection<AutomatonState> collected = new LinkedList<>();
 		collected.add(state);
@@ -82,6 +87,10 @@ public class NonDeterministicFiniteAutomaton<T> extends AbstractFiniteAutomaton<
 		}
 	}
 
+	/**
+	 * @param state
+	 * @return A collection of states that the given states has empty transitions to, NON - recursively.
+	 */
 	private Collection<AutomatonTransition<T>> getEmptyTransitions(AutomatonState state) {
 		final Collection<AutomatonTransition<T>> emptyTransitions = new LinkedList<>();
 		for (AutomatonTransition<T> transition : getTransitions()) {
@@ -92,6 +101,9 @@ public class NonDeterministicFiniteAutomaton<T> extends AbstractFiniteAutomaton<
 		return emptyTransitions;
 	}
 
+	/**
+	 * This automaton accepts the empty word if its start state has any empty transitions to an accepting state.
+	 */
 	@Override
 	public boolean accepts(Iterable<T> tokens) throws NoStartStateException, NoAcceptingStatesException {
 		if (!hasStartState()) {

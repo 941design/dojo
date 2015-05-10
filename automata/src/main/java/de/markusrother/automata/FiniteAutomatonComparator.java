@@ -17,6 +17,7 @@ public class FiniteAutomatonComparator<T> {
 	public static <U> boolean areStructurallyEqual(FiniteAutomaton<U> that, FiniteAutomaton<?> other) {
 		if (!that.hasStartState() && !other.hasStartState()) {
 			// By definition all automata without start states are equal!
+			// FIXME - This is NOT correct, if we test structural equality!!!
 			return true;
 		}
 		final Collection<U> thatAlphabet = that.getAlphabet();
@@ -38,10 +39,11 @@ public class FiniteAutomatonComparator<T> {
 	}
 
 	private boolean areEqual() {
-		// alphabet is already checked!
+		// Alphabet was already compared in static comparison method!
 		final AutomatonState thatStartState = that.getStartState();
 		final AutomatonState otherStartState = other.getStartState();
 		stateMap.put(thatStartState, otherStartState);
+		// Starting recursive comparison:
 		return areEqual(thatStartState, otherStartState);
 	}
 

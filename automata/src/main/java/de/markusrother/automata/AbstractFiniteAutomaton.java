@@ -8,6 +8,11 @@ import de.markusrother.automata.exceptions.DuplicateStateException;
 import de.markusrother.automata.exceptions.DuplicateTransitionException;
 import de.markusrother.automata.exceptions.NoSuchStateException;
 
+/**
+ * TODO - java8 would make some things nicer.
+ *
+ * @param <T> - the generic token/alphabet type.
+ */
 public abstract class AbstractFiniteAutomaton<T> implements FiniteAutomaton<T> {
 
 	private final Collection<AutomatonState> states;
@@ -52,8 +57,7 @@ public abstract class AbstractFiniteAutomaton<T> implements FiniteAutomaton<T> {
 		return getState(label) != null;
 	}
 
-	@Override
-	public AutomatonState getState(String label) {
+	protected AutomatonState getState(String label) {
 		for (AutomatonState state : states) {
 			if (state.hasLabel(label)) {
 				return state;
@@ -98,7 +102,6 @@ public abstract class AbstractFiniteAutomaton<T> implements FiniteAutomaton<T> {
 
 	@Override
 	public AutomatonState getStartState() {
-		// TODO - also implement getStartStates() to share an interface with NFA
 		return startState;
 	}
 
@@ -175,7 +178,9 @@ public abstract class AbstractFiniteAutomaton<T> implements FiniteAutomaton<T> {
 
 	private AutomatonTransition<T> getTransition(AutomatonState origin, AutomatonState target, T token) {
 		for (AutomatonTransition<T> transition : transitions) {
-			if (transition.hasOrigin(origin) && transition.hasTarget(target) && transition.hasToken(token)) {
+			if (transition.hasOrigin(origin) //
+					&& transition.hasTarget(target) //
+					&& transition.hasToken(token)) {
 				return transition;
 			}
 		}
@@ -190,6 +195,9 @@ public abstract class AbstractFiniteAutomaton<T> implements FiniteAutomaton<T> {
 	@Override
 	public AutomatonTransition<T> getTransition(AutomatonState origin, T token) {
 		if (origin == null) {
+			throw new IllegalArgumentException();
+		}
+		if (token == null) {
 			throw new IllegalArgumentException();
 		}
 		for (AutomatonTransition<T> transition : transitions) {
@@ -237,6 +245,9 @@ public abstract class AbstractFiniteAutomaton<T> implements FiniteAutomaton<T> {
 		}
 	}
 
+	/**
+	 * TODO - Currently only tests structural equality, NOT semantic equality!
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {

@@ -1,5 +1,8 @@
 package de.markusrother.automata;
 
+/**
+ * @param <T> - the generic token/alphabet type.
+ */
 public interface AutomatonTransition<T> {
 
 	AutomatonState getOrigin();
@@ -20,8 +23,8 @@ public interface AutomatonTransition<T> {
 
 	String getTargetLabel();
 
-	boolean hasOriginLabel(String originLabel);
+	boolean hasOriginLabel(String stateLabel);
 
-	boolean hasTargetLabel(String targetLabel);
+	boolean hasTargetLabel(String stateLabel);
 
 }

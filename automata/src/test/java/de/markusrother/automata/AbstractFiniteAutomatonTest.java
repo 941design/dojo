@@ -3,7 +3,7 @@ package de.markusrother.automata;
 import static de.markusrother.automata.AutomatonStateMatcher.isState;
 import static de.markusrother.automata.AutomatonTransitionMatcher.isTransition;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.emptyIterable;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 
 import java.util.ArrayList;
@@ -12,6 +12,7 @@ import java.util.Collection;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import de.markusrother.automata.exceptions.DuplicateStateException;
 import de.markusrother.automata.exceptions.DuplicateTransitionException;
@@ -19,6 +20,11 @@ import de.markusrother.automata.exceptions.NoAcceptingStatesException;
 import de.markusrother.automata.exceptions.NoStartStateException;
 import de.markusrother.automata.exceptions.NoSuchStateException;
 
+/**
+ * TODO - What about invalid (disconnected states) automata? Should they fail upon calling accept?
+ *
+ * TODO - What about unreachable states?
+ */
 public abstract class AbstractFiniteAutomatonTest {
 
 	protected static final String S1 = "S1";
@@ -28,14 +34,16 @@ public abstract class AbstractFiniteAutomatonTest {
 	protected static final String T1 = "T1";
 	protected static final String T2 = "T2";
 	protected static final Object TOKEN = new Object();
+	protected static final AutomatonState NO_STATE = null;
+	protected static final Object NO_TOKEN = null;
 
-	protected FiniteAutomaton<Object> automaton;
+	protected AbstractFiniteAutomaton<Object> automaton;
 
-	abstract <T> FiniteAutomaton<T> createAutomaton();
+	abstract <T> AbstractFiniteAutomaton<T> createAutomaton();
 
 	@Test
 	public void testNewAutomatonHasNoStates() throws Exception {
-		Assert.assertThat(automaton.getStates(), emptyIterable());
+		Assert.assertThat(automaton.getStates(), empty());
 	}
 
 	@Test(expected = NoStartStateException.class)
@@ -52,17 +60,17 @@ public abstract class AbstractFiniteAutomatonTest {
 
 	@Test
 	public void testNewAutomatonHasNoAcceptingStates() throws Exception {
-		Assert.assertThat(automaton.getAcceptingStates(), emptyIterable());
+		Assert.assertThat(automaton.getAcceptingStates(), empty());
 	}
 
 	@Test
 	public void testNewAutomatonHasNoTransitions() throws Exception {
-		Assert.assertThat(automaton.getTransitions(), emptyIterable());
+		Assert.assertThat(automaton.getTransitions(), empty());
 	}
 
 	@Test
 	public void testNewAutomatonHasNoAlphabet() throws Exception {
-		Assert.assertThat(automaton.getAlphabet(), emptyIterable());
+		Assert.assertThat(automaton.getAlphabet(), empty());
 	}
 
 	@Test
@@ -123,6 +131,26 @@ public abstract class AbstractFiniteAutomatonTest {
 		Assert.assertThat(automaton.getAlphabet(), contains(is(TOKEN)));
 	}
 
+	@Test(expected = IllegalArgumentException.class)
+	public void testGetTransitionThrowsExceptionIfTransitionIsNull() {
+		automaton.getTransition(NO_STATE, Mockito.mock(Object.class));
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testGetTransitionThrowsExceptionIfTokenIsNull() {
+		automaton.getTransition(Mockito.mock(AutomatonState.class), NO_TOKEN);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testGetSuccessorsThrowsExceptionIfStateIsNull() {
+		automaton.getSuccessors(NO_STATE, Mockito.mock(Object.class));
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testGetSuccessorsThrowsExceptionIfTokenIsNull() {
+		automaton.getSuccessors(Mockito.mock(AutomatonState.class), NO_TOKEN);
+	}
+
 	@Test
 	public void testAlphabetIsSet() throws Exception {
 		automaton.createStates(S1, S2)
@@ -133,10 +161,9 @@ public abstract class AbstractFiniteAutomatonTest {
 
 	@Test(expected = DuplicateTransitionException.class)
 	public void testCreateDuplicateTransition() throws Exception {
-		final String token = "token";
 		automaton.createStates(S1, S2)
-					.createTransition(S1, S2, token)
-					.createTransition(S1, S2, token);
+					.createTransition(S1, S2, TOKEN)
+					.createTransition(S1, S2, TOKEN);
 	}
 
 	@Test(expected = NoSuchStateException.class)
@@ -156,21 +183,19 @@ public abstract class AbstractFiniteAutomatonTest {
 		automaton.createStates(S1, S2)
 					.setStartState(S1)
 					.addAcceptingStates(S2);
-		final Object token = new Object();
 		assertRejects();
-		assertRejects(token);
-		assertRejects(token, token);
+		assertRejects(TOKEN);
+		assertRejects(TOKEN, TOKEN);
 	}
 
 	@Test
 	public void testAutomatonAcceptSingleObject() throws Exception {
-		final Object obj = new Object();
 		automaton.createStates(S1, S2)
 					.setStartState(S1)
 					.addAcceptingStates(S2)
-					.createTransition(S1, S2, obj);
+					.createTransition(S1, S2, TOKEN);
 		assertRejects();
-		assertAccepts(obj);
+		assertAccepts(TOKEN);
 	}
 
 	@Test

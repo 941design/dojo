@@ -7,14 +7,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * TODO - test circular empty transitions
- *
- * TODO - test has (not) empty transitions
- *
- * TODO - test getSuccessors()
- *
- */
 public class NonDeterministicFiniteAutomatonTest extends AbstractFiniteAutomatonTest {
 
 	@Before
@@ -23,7 +15,7 @@ public class NonDeterministicFiniteAutomatonTest extends AbstractFiniteAutomaton
 	}
 
 	@Override
-	<T> FiniteAutomaton<T> createAutomaton() {
+	<T> NonDeterministicFiniteAutomaton<T> createAutomaton() {
 		return new NonDeterministicFiniteAutomaton<T>();
 	}
 
@@ -78,7 +70,19 @@ public class NonDeterministicFiniteAutomatonTest extends AbstractFiniteAutomaton
 					.addAcceptingStates(S3)
 					.createEmptyTransition(S1, S2)
 					.createTransition(S2, S3, TOKEN);
+		assertRejects();
 		assertAccepts(TOKEN);
+	}
+
+	@Test
+	public void testAcceptsEmptyWordIfStartStateHasEmptyTransitionToAcceptingState() throws Exception {
+		automaton.createStates(S1, S2, S3)
+					.setStartState(S1)
+					.addAcceptingStates(S3)
+					.createEmptyTransition(S1, S2)
+					.createEmptyTransition(S2, S3);
+		assertAccepts();
+		assertRejects(TOKEN);
 	}
 
 }

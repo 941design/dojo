@@ -1,5 +1,8 @@
 package de.markusrother.automata;
 
+/**
+ * @param <T> - the generic token/alphabet type.
+ */
 class AutomatonTransitionImpl<T> extends AbstractAutomatonTransitionImpl<T> {
 
 	private final T token;

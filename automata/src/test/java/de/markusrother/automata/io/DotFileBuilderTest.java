@@ -14,6 +14,7 @@ import org.mockito.Mockito;
 
 import de.markusrother.automata.DeterministicFiniteAutomaton;
 import de.markusrother.automata.FiniteAutomaton;
+import de.markusrother.automata.NonDeterministicFiniteAutomaton;
 import de.markusrother.automata.exceptions.NoAcceptingStatesException;
 import de.markusrother.automata.exceptions.NoStartStateException;
 
@@ -145,6 +146,19 @@ public class DotFileBuilderTest {
 		DotFileBuilder.write(dfa, out);
 		assertThat(out.toString(),
 				matchesPattern(".*" + S1 + " -> " + S2 + " \\[label=\"" + TOKEN + "\"\\];.*", Pattern.DOTALL));
+	}
+
+	@Test
+	public void testWriteEmptyTransitions() throws Exception {
+		final NonDeterministicFiniteAutomaton<String> dfa = new NonDeterministicFiniteAutomaton<String>();
+		dfa.createStates(S1, S2)
+			.setStartState(S1)
+			.addAcceptingStates(S2)
+			.createEmptyTransition(S1, S2);
+		final Writer out = new StringWriter();
+		DotFileBuilder.write(dfa, out);
+		assertThat(out.toString(),
+				matchesPattern(".*" + S1 + " -> " + S2 + " \\[label=\"€\"\\];.*", Pattern.DOTALL));
 	}
 
 	@Test

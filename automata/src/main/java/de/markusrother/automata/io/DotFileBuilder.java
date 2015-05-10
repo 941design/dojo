@@ -9,25 +9,33 @@ import de.markusrother.automata.FiniteAutomaton;
 import de.markusrother.automata.exceptions.NoAcceptingStatesException;
 import de.markusrother.automata.exceptions.NoStartStateException;
 
+/**
+ * TODO - This could become (or inherit from) a generic builder for graphs. .addNodes(Collection<Node> nodes, NodeType
+ * nodeType); .addGraph(Graph<AutomatonState> g); interface Graph<T> { Collection<Transition<T>> getTransitions(T node);
+ * }
+ *
+ * @param <T> - the generic token/alphabet type.
+ */
 public class DotFileBuilder<T> {
 
 	private static final String NL = "\n";
 	private static final String TAB = "\t";
 	private static final String SPACE = " ";
 	private static final String VIRTUAL_START_STATE_LABEL = "virtual_start_state";
+	private static final String EMPTY_TRANSITION_SYMBOL = "€";
 
 	private final Writer out;
 	private final FiniteAutomaton<T> automaton;
 
-	public static <T> void write(FiniteAutomaton<T> dfa, Writer out) throws IOException, NoStartStateException,
+	public static <T> void write(FiniteAutomaton<T> automaton, Writer out) throws IOException, NoStartStateException,
 			NoAcceptingStatesException {
-		if (!dfa.hasStartState()) {
+		if (!automaton.hasStartState()) {
 			throw new NoStartStateException();
 		}
-		if (!dfa.hasAcceptingStates()) {
+		if (!automaton.hasAcceptingStates()) {
 			throw new NoAcceptingStatesException();
 		}
-		final DotFileBuilder<T> dotFileBuilder = new DotFileBuilder<T>(dfa, out);
+		final DotFileBuilder<T> dotFileBuilder = new DotFileBuilder<T>(automaton, out);
 		dotFileBuilder.writeAutomaton();
 	}
 
@@ -38,9 +46,9 @@ public class DotFileBuilder<T> {
 
 	private void writeAutomaton() throws IOException {
 		this.writeHeader()
-			.writeVirtualState()
+			.writeVirtualStartState()
 			.writeAcceptingStates()
-			.writeRemainingStates()
+			.writeNonAcceptingStates()
 			.writeTransitions()
 			.writeFooter();
 		out.flush();
@@ -57,7 +65,7 @@ public class DotFileBuilder<T> {
 	}
 
 	private DotFileBuilder<T> writeHeader() throws IOException {
-		return this.writeLine("digraph DFA {")
+		return this.writeLine("digraph FiniteAutomaton {")
 					.writeLine(TAB + "rankdir=LR;")
 					.writeLine(TAB + "size=\"%s\"", 8.5);
 	}
@@ -66,7 +74,8 @@ public class DotFileBuilder<T> {
 		return this.writeLine("}");
 	}
 
-	private DotFileBuilder<T> writeVirtualState() throws IOException {
+	private DotFileBuilder<T> writeVirtualStartState() throws IOException {
+		// TODO - create Node class with attributes
 		return this.writeLine(TAB + "node [shape=point, style=invis]; %s;", VIRTUAL_START_STATE_LABEL);
 	}
 
@@ -79,7 +88,7 @@ public class DotFileBuilder<T> {
 		return this.writeLine(";");
 	}
 
-	private DotFileBuilder<T> writeRemainingStates() throws IOException {
+	private DotFileBuilder<T> writeNonAcceptingStates() throws IOException {
 		// TODO - create Node class with attributes
 		this.write(TAB + "node [shape=circle, style=solid];");
 		for (AutomatonState state : automaton.getStates()) {
@@ -95,8 +104,11 @@ public class DotFileBuilder<T> {
 		this.writeLine(TAB + "%s -> %s;", VIRTUAL_START_STATE_LABEL, automaton.getStartState()
 								.getLabel());
 		for (AutomatonTransition<T> transition : automaton.getTransitions()) {
-			this.writeLine(TAB + "%s -> %s [label=\"%s\"];", transition.getOriginLabel(),
-					transition.getTargetLabel(), transition.getToken());
+			final String originLabel = transition.getOriginLabel();
+			final String targetLabel = transition.getTargetLabel();
+			final String tokenString = transition.isEmpty() ? EMPTY_TRANSITION_SYMBOL
+					: String.valueOf(transition.getToken());
+			this.writeLine(TAB + "%s -> %s [label=\"%s\"];", originLabel, targetLabel, tokenString);
 		}
 		return this;
 	}

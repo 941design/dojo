@@ -3,9 +3,7 @@ package de.markusrother.automata;
 import java.util.Collection;
 
 /**
- * TODO - test getSuccessors (?)
- *
- * @param <T>
+ * @param <T> - the generic token/alphabet type.
  */
 public interface TransitionFunction<T> {
 

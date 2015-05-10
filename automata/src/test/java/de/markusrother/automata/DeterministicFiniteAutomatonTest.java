@@ -10,7 +10,7 @@ public class DeterministicFiniteAutomatonTest extends AbstractFiniteAutomatonTes
 	}
 
 	@Override
-	<T> FiniteAutomaton<T> createAutomaton() {
+	<T> DeterministicFiniteAutomaton<T> createAutomaton() {
 		return new DeterministicFiniteAutomaton<T>();
 	}
 

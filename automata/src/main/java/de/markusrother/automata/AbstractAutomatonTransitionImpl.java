@@ -41,19 +41,19 @@ public abstract class AbstractAutomatonTransitionImpl<T> implements AutomatonTra
 	}
 
 	@Override
-	public boolean hasOriginLabel(String originLabel) {
-		if (originLabel == null) {
+	public boolean hasOriginLabel(String stateLabel) {
+		if (stateLabel == null) {
 			throw new IllegalArgumentException();
 		}
-		return originLabel.equals(getOriginLabel());
+		return stateLabel.equals(getOriginLabel());
 	}
 
 	@Override
-	public boolean hasTargetLabel(String targetLabel) {
-		if (targetLabel == null) {
+	public boolean hasTargetLabel(String stateLabel) {
+		if (stateLabel == null) {
 			throw new IllegalArgumentException();
 		}
-		return targetLabel.equals(getTargetLabel());
+		return stateLabel.equals(getTargetLabel());
 	}
 
 }
