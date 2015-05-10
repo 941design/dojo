@@ -109,6 +109,16 @@ public abstract class AbstractFiniteAutomaton<T> implements FiniteAutomaton<T> {
 	}
 
 	@Override
+	public boolean hasAcceptingStates() {
+		for (AutomatonState state : states) {
+			if (state.isAccepting()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
 	public Collection<AutomatonState> getAcceptingStates() {
 		final Collection<AutomatonState> acceptingStates = new LinkedList<>();
 		for (AutomatonState state : states) {
@@ -212,7 +222,7 @@ public abstract class AbstractFiniteAutomaton<T> implements FiniteAutomaton<T> {
 			}
 		}
 		if (hasStartState()) {
-			String startStateLabel = startState.getLabel();
+			final String startStateLabel = startState.getLabel();
 			copy.setStartState(startStateLabel);
 		}
 	}

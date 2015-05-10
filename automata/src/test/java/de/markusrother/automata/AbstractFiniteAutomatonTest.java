@@ -15,6 +15,7 @@ import org.junit.Test;
 
 import de.markusrother.automata.exceptions.DuplicateStateException;
 import de.markusrother.automata.exceptions.DuplicateTransitionException;
+import de.markusrother.automata.exceptions.NoAcceptingStatesException;
 import de.markusrother.automata.exceptions.NoStartStateException;
 import de.markusrother.automata.exceptions.NoSuchStateException;
 
@@ -38,7 +39,14 @@ public abstract class AbstractFiniteAutomatonTest {
 	}
 
 	@Test(expected = NoStartStateException.class)
-	public void testNewAutomatonHasNoStartState() throws Exception {
+	public void testAcceptanceRequiresStartState() throws Exception {
+		automaton.accepts(new ArrayList<Object>());
+	}
+
+	@Test(expected = NoAcceptingStatesException.class)
+	public void testAcceptanceRequiresAcceptingStates() throws Exception {
+		automaton.createStates(S1)
+					.setStartState(S1);
 		automaton.accepts(new ArrayList<Object>());
 	}
 
@@ -144,8 +152,10 @@ public abstract class AbstractFiniteAutomatonTest {
 
 	@Test
 	public void testAutomatonRejects() throws Exception {
-		automaton.createStates(S1)
-					.setStartState(S1);
+		// TODO - All states should be connected!
+		automaton.createStates(S1, S2)
+					.setStartState(S1)
+					.addAcceptingStates(S2);
 		final Object token = new Object();
 		assertRejects();
 		assertRejects(token);
@@ -422,11 +432,11 @@ public abstract class AbstractFiniteAutomatonTest {
 									.next() == TOKEN);
 	}
 
-	protected void assertAccepts(Object... tokens) throws NoStartStateException {
+	protected void assertAccepts(Object... tokens) throws NoStartStateException, NoAcceptingStatesException {
 		Assert.assertTrue(automaton.accepts(Arrays.asList(tokens)));
 	}
 
-	protected void assertRejects(Object... tokens) throws NoStartStateException {
+	protected void assertRejects(Object... tokens) throws NoStartStateException, NoAcceptingStatesException {
 		Assert.assertFalse(automaton.accepts(Arrays.asList(tokens)));
 	}
 

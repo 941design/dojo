@@ -5,6 +5,7 @@ import java.util.LinkedList;
 
 import de.markusrother.automata.exceptions.DuplicateEmptyTransitionException;
 import de.markusrother.automata.exceptions.DuplicateTransitionException;
+import de.markusrother.automata.exceptions.NoAcceptingStatesException;
 import de.markusrother.automata.exceptions.NoStartStateException;
 import de.markusrother.automata.exceptions.NoSuchStateException;
 
@@ -92,9 +93,12 @@ public class NonDeterministicFiniteAutomaton<T> extends AbstractFiniteAutomaton<
 	}
 
 	@Override
-	public boolean accepts(Iterable<T> tokens) throws NoStartStateException {
+	public boolean accepts(Iterable<T> tokens) throws NoStartStateException, NoAcceptingStatesException {
 		if (!hasStartState()) {
 			throw new NoStartStateException();
+		}
+		if (!hasAcceptingStates()) {
+			throw new NoAcceptingStatesException();
 		}
 		final Collection<AutomatonState> startStates = expandState(getStartState());
 		final TransitionFunctionApplicator<T> runner = new TransitionFunctionApplicator<T>(this, startStates, tokens);

@@ -1,6 +1,6 @@
 package de.markusrother.automata;
 
-interface AutomatonState {
+public interface AutomatonState {
 
 	boolean isAccepting();
 

@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import de.markusrother.automata.exceptions.DuplicateStateException;
 import de.markusrother.automata.exceptions.DuplicateTransitionException;
+import de.markusrother.automata.exceptions.NoAcceptingStatesException;
 import de.markusrother.automata.exceptions.NoStartStateException;
 import de.markusrother.automata.exceptions.NoSuchStateException;
 
@@ -21,7 +22,7 @@ public interface FiniteAutomaton<T> extends TransitionFunction<T> {
 
 	Collection<AutomatonState> getStates();
 
-	AutomatonState getState(String label);
+	AutomatonState getState(String label); // TODO - only used for tests
 
 	AutomatonState getStartState();
 
@@ -32,6 +33,8 @@ public interface FiniteAutomaton<T> extends TransitionFunction<T> {
 	FiniteAutomaton<T> addAcceptingStates(String... acceptingStateLabels) throws NoSuchStateException;
 
 	Collection<AutomatonState> getAcceptingStates();
+
+	boolean hasAcceptingStates();
 
 	FiniteAutomaton<T> createTransition(String originLabel, String targetLabel, T token) throws NoSuchStateException,
 			DuplicateTransitionException;
@@ -53,8 +56,9 @@ public interface FiniteAutomaton<T> extends TransitionFunction<T> {
 	 * @return True if given automaton stops in an accepting {@link de.markusrother.automata.AutomatonState}.
 	 *
 	 * @throws NoStartStateException
+	 * @throws NoAcceptingStatesException
 	 */
-	boolean accepts(Iterable<T> tokens) throws NoStartStateException;
+	boolean accepts(Iterable<T> tokens) throws NoStartStateException, NoAcceptingStatesException;
 
 	/**
 	 * @return A full copy of the given automaton. Tokens are not copied!
