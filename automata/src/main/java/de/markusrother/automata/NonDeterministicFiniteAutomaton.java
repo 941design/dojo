@@ -56,6 +56,7 @@ public class NonDeterministicFiniteAutomaton<T> extends AbstractFiniteAutomaton<
 	 */
 	@Override
 	public Collection<AutomatonState> getSuccessors(AutomatonState predecessor, T token) {
+		// TODO - We should also assert that state and token belong to this automaton!
 		final AutomatonTransition<T> transition = getTransition(predecessor, token);
 		final AutomatonState successor = transition == null ? getNullState() : transition.getTarget();
 		return expandState(successor);

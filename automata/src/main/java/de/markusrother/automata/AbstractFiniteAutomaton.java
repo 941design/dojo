@@ -260,4 +260,11 @@ public abstract class AbstractFiniteAutomaton<T> implements FiniteAutomaton<T> {
 		return FiniteAutomatonComparator.areStructurallyEqual(this, other);
 	}
 
+	@Override
+	public String toString() {
+		final String format = "alphabet:%s\nstates: %s\nstart state: %s\naccepting states:%s\ntransitions:%s";
+		return String.format(format, getAlphabet(), getStates(), getStartState(), getAcceptingStates(),
+				getTransitions());
+	}
+
 }

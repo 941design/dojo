@@ -25,7 +25,7 @@ public class EmptyAutomatonTransitionImpl<T> extends AbstractAutomatonTransition
 
 	@Override
 	public String toString() {
-		return getOriginLabel() + "-()->" + getTargetLabel();
+		return getOriginLabel() + "-*->" + getTargetLabel();
 	}
 
 }

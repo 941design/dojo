@@ -34,4 +34,9 @@ class NullState implements AutomatonState {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
+	public String toString() {
+		return "NULL";
+	}
+
 }

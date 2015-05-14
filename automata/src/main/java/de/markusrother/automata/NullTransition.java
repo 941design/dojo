@@ -74,4 +74,11 @@ class NullTransition<T> implements AutomatonTransition<T> {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
+	public String toString() {
+		// TODO - This should actually follow the same pattern, which calls for an origin state:
+		// SX -*-> NULL
+		return "* -()-> NULL";
+	}
+
 }
