@@ -11,14 +11,17 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
 import de.markusrother.automata.exceptions.DuplicateStateException;
 import de.markusrother.automata.exceptions.DuplicateTransitionException;
+import de.markusrother.automata.exceptions.InvalidOriginException;
 import de.markusrother.automata.exceptions.NoAcceptingStatesException;
 import de.markusrother.automata.exceptions.NoStartStateException;
 import de.markusrother.automata.exceptions.NoSuchStateException;
+import de.markusrother.automata.exceptions.NotInAlphabetException;
 
 /**
  * TODO - What about invalid (disconnected states) automata? Should they fail upon calling accept?
@@ -137,8 +140,15 @@ public abstract class AbstractFiniteAutomatonTest {
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public void testGetTransitionThrowsExceptionIfTokenIsNull() {
-		automaton.getTransition(Mockito.mock(AutomatonState.class), NO_TOKEN);
+	public void testGetTransitionThrowsExceptionIfTokenIsNull() throws Exception {
+		automaton.createStates(S1)
+					.getTransition(automaton.getState(S1), NO_TOKEN);
+	}
+
+	@Test(expected = NotInAlphabetException.class)
+	public void testGetTransitionThrowsExceptionIfTokenDoesNotBelongToAlphabet() throws Exception {
+		automaton.createStates(S1)
+					.getTransition(automaton.getState(S1), new Object());
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -146,9 +156,21 @@ public abstract class AbstractFiniteAutomatonTest {
 		automaton.getSuccessors(NO_STATE, Mockito.mock(Object.class));
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testGetSuccessorsThrowsExceptionIfTokenIsNull() {
+	@Test(expected = InvalidOriginException.class)
+	public void testGetSuccessorsThrowsExceptionIfStateIsInvalid() {
 		automaton.getSuccessors(Mockito.mock(AutomatonState.class), NO_TOKEN);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testGetSuccessorsThrowsExceptionIfTokenIsNull() throws Exception {
+		automaton.createStates(S1)
+					.getSuccessors(automaton.getState(S1), NO_TOKEN);
+	}
+
+	@Test(expected = NotInAlphabetException.class)
+	public void testGetSuccessorsThrowsExceptionIfTokenDoesNotBelongToAlphabet() throws Exception {
+		automaton.createStates(S1)
+					.getSuccessors(automaton.getState(S1), new Object());
 	}
 
 	@Test
@@ -184,8 +206,15 @@ public abstract class AbstractFiniteAutomatonTest {
 					.setStartState(S1)
 					.addAcceptingStates(S2);
 		assertRejects();
-		assertRejects(TOKEN);
-		assertRejects(TOKEN, TOKEN);
+	}
+
+	@Test(expected = NotInAlphabetException.class)
+	public void testAutomatonThrowsExceptionForInvalidToken() throws Exception {
+		// TODO - All states should be connected!
+		automaton.createStates(S1, S2)
+					.setStartState(S1)
+					.addAcceptingStates(S2)
+					.accepts(Arrays.asList(TOKEN));
 	}
 
 	@Test
@@ -444,6 +473,24 @@ public abstract class AbstractFiniteAutomatonTest {
 				.createTransition(T2, T2, 1)
 				.createTransition(T2, T1, 0);
 		Assert.assertEquals(automaton, other);
+	}
+
+	@Ignore("Structural equality comparison cannot be exhaustive, because we cannot compare unreachable/disconnected components.")
+	@Test
+	public void testStructuralEqualityWithUnreachableStates() throws Exception {
+		automaton.createStates(S1, S2);
+		final FiniteAutomaton<Object> other = createAutomaton();
+		other.createStates(T1, T2);
+		Assert.assertEquals(automaton, other);
+	}
+
+	@Ignore("Structural equality comparison cannot be exhaustive, because we cannot compare unreachable/disconnected components.")
+	@Test
+	public void testStructuralInequalityWithUnreachableStates() throws Exception {
+		automaton.createStates(S1);
+		final FiniteAutomaton<Object> other = createAutomaton();
+		other.createStates(T1, T2);
+		Assert.assertNotEquals(automaton, other);
 	}
 
 	@Test

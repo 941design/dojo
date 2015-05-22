@@ -1,14 +1,17 @@
 package de.markusrother.automata;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.stream.Collectors;
 
 import de.markusrother.automata.exceptions.DuplicateEmptyTransitionException;
 import de.markusrother.automata.exceptions.DuplicateTransitionException;
+import de.markusrother.automata.exceptions.InvalidOriginException;
 import de.markusrother.automata.exceptions.NoAcceptingStatesException;
 import de.markusrother.automata.exceptions.NoStartStateException;
 import de.markusrother.automata.exceptions.NoSuchStateException;
+import de.markusrother.automata.exceptions.NotInAlphabetException;
 
 /**
  * This automaton accepts the empty word if its start state has any empty transitions to an accepting state.
@@ -51,11 +54,16 @@ public class NonDeterministicFiniteAutomaton<T> extends AbstractFiniteAutomaton<
 	}
 
 	/**
+	 * @throws NotInAlphabetException if given token does not belong to alphabet.
+	 * @throws InvalidOriginException if given state does not belong to automaton.
 	 * @throws IllegalArgumentException if either parameter is null.
 	 */
 	@Override
-	public Collection<AutomatonState> getSuccessors(AutomatonState predecessor, T token) {
-		// TODO - We should also assert that state and token belong to this automaton!
+	public Collection<AutomatonState> getSuccessors(AutomatonState predecessor, T token) throws NotInAlphabetException,
+			InvalidOriginException {
+		if (isNullState(predecessor)) {
+			return Collections.emptyList();
+		}
 		final AutomatonTransition<T> transition = getTransition(predecessor, token);
 		final AutomatonState successor = transition == null ? getNullState() : transition.getTarget();
 		return expandState(successor);

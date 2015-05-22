@@ -4,9 +4,11 @@ import java.util.Collection;
 
 import de.markusrother.automata.exceptions.DuplicateStateException;
 import de.markusrother.automata.exceptions.DuplicateTransitionException;
+import de.markusrother.automata.exceptions.InvalidOriginException;
 import de.markusrother.automata.exceptions.NoAcceptingStatesException;
 import de.markusrother.automata.exceptions.NoStartStateException;
 import de.markusrother.automata.exceptions.NoSuchStateException;
+import de.markusrother.automata.exceptions.NotInAlphabetException;
 
 /**
  * @param <T> - the generic token/alphabet type.
@@ -45,7 +47,8 @@ public interface FiniteAutomaton<T> extends TransitionFunction<T> {
 	 */
 	Collection<AutomatonTransition<T>> getTransitions();
 
-	AutomatonTransition<T> getTransition(AutomatonState origin, T token);
+	AutomatonTransition<T> getTransition(AutomatonState origin, T token) throws NotInAlphabetException,
+			InvalidOriginException;
 
 	/**
 	 * @param tokens - The word for which to test acceptance.
@@ -54,8 +57,10 @@ public interface FiniteAutomaton<T> extends TransitionFunction<T> {
 	 *
 	 * @throws NoStartStateException
 	 * @throws NoAcceptingStatesException
+	 * @throws NotInAlphabetException
 	 */
-	boolean accepts(Iterable<T> tokens) throws NoStartStateException, NoAcceptingStatesException;
+	boolean accepts(Iterable<T> tokens) throws NoStartStateException, NoAcceptingStatesException,
+			NotInAlphabetException;
 
 	/**
 	 * @return A full copy of the given automaton. Tokens are not copied!

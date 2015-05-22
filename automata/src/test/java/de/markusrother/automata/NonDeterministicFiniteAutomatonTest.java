@@ -82,7 +82,6 @@ public class NonDeterministicFiniteAutomatonTest extends AbstractFiniteAutomaton
 					.createEmptyTransition(S1, S2)
 					.createEmptyTransition(S2, S3);
 		assertAccepts();
-		assertRejects(TOKEN);
 	}
 
 }

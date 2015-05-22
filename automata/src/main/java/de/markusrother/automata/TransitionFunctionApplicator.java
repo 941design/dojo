@@ -4,6 +4,9 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.stream.Collectors;
 
+import de.markusrother.automata.exceptions.InvalidOriginException;
+import de.markusrother.automata.exceptions.NotInAlphabetException;
+
 /**
  * Stateful object for executing a {@link de.markusrother.automata.TransitionFunction} for a given input.
  *
@@ -37,7 +40,8 @@ class TransitionFunctionApplicator<T> implements Iterator<Collection<AutomatonSt
 		return currentStates;
 	}
 
-	private Collection<AutomatonState> collectSuccessors(Collection<AutomatonState> predecessors, T token) {
+	private Collection<AutomatonState> collectSuccessors(Collection<AutomatonState> predecessors, T token)
+			throws NotInAlphabetException, InvalidOriginException {
 		return predecessors.stream()
 					.flatMap(predecessor -> transitionFunction.getSuccessors(predecessor, token)
 																		.stream())

@@ -7,7 +7,9 @@ import java.util.stream.Collectors;
 
 import de.markusrother.automata.exceptions.DuplicateStateException;
 import de.markusrother.automata.exceptions.DuplicateTransitionException;
+import de.markusrother.automata.exceptions.InvalidOriginException;
 import de.markusrother.automata.exceptions.NoSuchStateException;
+import de.markusrother.automata.exceptions.NotInAlphabetException;
 
 /**
  * @param <T> - the generic token/alphabet type.
@@ -78,6 +80,10 @@ public abstract class AbstractFiniteAutomaton<T> implements FiniteAutomaton<T> {
 	 */
 	protected AutomatonState getNullState() {
 		return NullState.getInstance();
+	}
+
+	protected boolean isNullState(AutomatonState state) {
+		return state == getNullState();
 	}
 
 	/**
@@ -179,12 +185,19 @@ public abstract class AbstractFiniteAutomaton<T> implements FiniteAutomaton<T> {
 	}
 
 	@Override
-	public AutomatonTransition<T> getTransition(AutomatonState origin, T token) {
-		if (origin == null) {
+	public AutomatonTransition<T> getTransition(AutomatonState origin, T token) throws NotInAlphabetException,
+			InvalidOriginException {
+		if (origin == null || isNullState(origin)) {
 			throw new IllegalArgumentException();
+		}
+		if (!states.contains(origin)) {
+			throw new InvalidOriginException(origin);
 		}
 		if (token == null) {
 			throw new IllegalArgumentException();
+		}
+		if (!alphabet.contains(token)) {
+			throw new NotInAlphabetException(alphabet, token);
 		}
 		return transitions.stream()
 							.filter(t -> t.hasOrigin(origin))

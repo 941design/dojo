@@ -4,8 +4,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
+import de.markusrother.automata.exceptions.InvalidOriginException;
 import de.markusrother.automata.exceptions.NoAcceptingStatesException;
 import de.markusrother.automata.exceptions.NoStartStateException;
+import de.markusrother.automata.exceptions.NotInAlphabetException;
 
 /**
  * @param <T> - the generic token/alphabet type.
@@ -24,11 +26,16 @@ public class DeterministicFiniteAutomaton<T> extends AbstractFiniteAutomaton<T> 
 	}
 
 	/**
+	 * @throws NotInAlphabetException if given token does not belong to alphabet.
+	 * @throws InvalidOriginException if given state does not belong to automaton.
 	 * @throws IllegalArgumentException if either parameter is null.
 	 */
 	@Override
-	public Collection<AutomatonState> getSuccessors(AutomatonState predecessor, T token) {
-		// TODO - We should also assert that state and token belong to this automaton!
+	public Collection<AutomatonState> getSuccessors(AutomatonState predecessor, T token) throws NotInAlphabetException,
+			InvalidOriginException {
+		if (isNullState(predecessor)) {
+			return Collections.emptyList();
+		}
 		final AutomatonTransition<T> transition = getTransition(predecessor, token);
 		final AutomatonState successor = transition == null ? getNullState() : transition.getTarget();
 		return Collections.unmodifiableCollection(Arrays.asList(successor));
