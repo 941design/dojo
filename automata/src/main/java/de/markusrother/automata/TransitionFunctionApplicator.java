@@ -2,7 +2,7 @@ package de.markusrother.automata;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.stream.Collectors;
 
 /**
  * Stateful object for executing a {@link de.markusrother.automata.TransitionFunction} for a given input.
@@ -38,11 +38,10 @@ class TransitionFunctionApplicator<T> implements Iterator<Collection<AutomatonSt
 	}
 
 	private Collection<AutomatonState> collectSuccessors(Collection<AutomatonState> predecessors, T token) {
-		final Collection<AutomatonState> successors = new LinkedList<>();
-		for (AutomatonState predecessor : predecessors) {
-			successors.addAll(transitionFunction.getSuccessors(predecessor, token));
-		}
-		return successors;
+		return predecessors.stream()
+					.flatMap(predecessor -> transitionFunction.getSuccessors(predecessor, token)
+																		.stream())
+					.collect(Collectors.toList());
 	}
 
 	boolean isAccepting() {
@@ -50,12 +49,8 @@ class TransitionFunctionApplicator<T> implements Iterator<Collection<AutomatonSt
 	}
 
 	private static boolean containsAcceptingState(Collection<AutomatonState> states) {
-		for (AutomatonState state : states) {
-			if (state.isAccepting()) {
-				return true;
-			}
-		}
-		return false;
+		return states.stream()
+						.anyMatch(s -> s.isAccepting());
 	}
 
 	@Override
