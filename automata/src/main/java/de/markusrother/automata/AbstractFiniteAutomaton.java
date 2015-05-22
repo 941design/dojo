@@ -3,14 +3,13 @@ package de.markusrother.automata;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.stream.Collectors;
 
 import de.markusrother.automata.exceptions.DuplicateStateException;
 import de.markusrother.automata.exceptions.DuplicateTransitionException;
 import de.markusrother.automata.exceptions.NoSuchStateException;
 
 /**
- * TODO - java8 would make some things nicer.
- *
  * @param <T> - the generic token/alphabet type.
  */
 public abstract class AbstractFiniteAutomaton<T> implements FiniteAutomaton<T> {
@@ -58,20 +57,17 @@ public abstract class AbstractFiniteAutomaton<T> implements FiniteAutomaton<T> {
 	}
 
 	protected AutomatonState getState(String label) {
-		for (AutomatonState state : states) {
-			if (state.hasLabel(label)) {
-				return state;
-			}
-		}
-		return null;
+		return states.stream()
+						.filter(s -> s.hasLabel(label))
+						.findFirst()
+						.orElse(null);
 	}
 
 	protected AutomatonState getExistingState(String label) throws NoSuchStateException {
-		final AutomatonState state = getState(label);
-		if (state != null) {
-			return state;
-		}
-		throw new NoSuchStateException(label);
+		return states.stream()
+						.filter(s -> s.hasLabel(label))
+						.findFirst()
+						.orElseThrow(new NoSuchStateException(label));
 	}
 
 	/**
@@ -113,23 +109,15 @@ public abstract class AbstractFiniteAutomaton<T> implements FiniteAutomaton<T> {
 
 	@Override
 	public boolean hasAcceptingStates() {
-		for (AutomatonState state : states) {
-			if (state.isAccepting()) {
-				return true;
-			}
-		}
-		return false;
+		return states.stream()
+						.anyMatch(s -> s.isAccepting());
 	}
 
 	@Override
 	public Collection<AutomatonState> getAcceptingStates() {
-		final Collection<AutomatonState> acceptingStates = new LinkedList<>();
-		for (AutomatonState state : states) {
-			if (state.isAccepting()) {
-				acceptingStates.add(state);
-			}
-		}
-		return acceptingStates;
+		return states.stream()
+						.filter(s -> s.isAccepting())
+						.collect(Collectors.toList());
 	}
 
 	@Override
@@ -177,14 +165,12 @@ public abstract class AbstractFiniteAutomaton<T> implements FiniteAutomaton<T> {
 	}
 
 	private AutomatonTransition<T> getTransition(AutomatonState origin, AutomatonState target, T token) {
-		for (AutomatonTransition<T> transition : transitions) {
-			if (transition.hasOrigin(origin) //
-					&& transition.hasTarget(target) //
-					&& transition.hasToken(token)) {
-				return transition;
-			}
-		}
-		return null;
+		return transitions.stream()
+							.filter(t -> t.hasOrigin(origin))
+							.filter(t -> t.hasTarget(target))
+							.filter(t -> t.hasToken(token))
+							.findFirst()
+							.orElse(null);
 	}
 
 	@Override
@@ -200,12 +186,11 @@ public abstract class AbstractFiniteAutomaton<T> implements FiniteAutomaton<T> {
 		if (token == null) {
 			throw new IllegalArgumentException();
 		}
-		for (AutomatonTransition<T> transition : transitions) {
-			if (transition.hasOrigin(origin) && transition.hasToken(token)) {
-				return transition;
-			}
-		}
-		return getNullTransition();
+		return transitions.stream()
+							.filter(t -> t.hasOrigin(origin))
+							.filter(t -> t.hasToken(token))
+							.findFirst()
+							.orElse(getNullTransition());
 	}
 
 	protected FiniteAutomaton<T> copyInto(AbstractFiniteAutomaton<T> copy) {
