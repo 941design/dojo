@@ -2,6 +2,7 @@ package de.markusrother.automata;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.stream.Collectors;
 
 import de.markusrother.automata.exceptions.DuplicateEmptyTransitionException;
 import de.markusrother.automata.exceptions.DuplicateTransitionException;
@@ -36,14 +37,12 @@ public class NonDeterministicFiniteAutomaton<T> extends AbstractFiniteAutomaton<
 	}
 
 	private AutomatonTransition<T> getTransition(AutomatonState origin, AutomatonState target) {
-		for (AutomatonTransition<T> transition : getTransitions()) {
-			if (transition.hasOrigin(origin) //
-					&& transition.hasTarget(target) //
-					&& transition.isEmpty()) {
-				return transition;
-			}
-		}
-		return null;
+		return getTransitions().stream()
+								.filter(t -> t.hasOrigin(origin))
+								.filter(t -> t.hasTarget(target))
+								.filter(t -> t.isEmpty())
+								.findFirst()
+								.orElse(null);
 	}
 
 	@Override
@@ -93,13 +92,10 @@ public class NonDeterministicFiniteAutomaton<T> extends AbstractFiniteAutomaton<
 	 * @return A collection of states that the given states has empty transitions to, NON - recursively.
 	 */
 	private Collection<AutomatonTransition<T>> getEmptyTransitions(AutomatonState state) {
-		final Collection<AutomatonTransition<T>> emptyTransitions = new LinkedList<>();
-		for (AutomatonTransition<T> transition : getTransitions()) {
-			if (transition.isEmpty() && transition.hasOrigin(state)) {
-				emptyTransitions.add(transition);
-			}
-		}
-		return emptyTransitions;
+		return getTransitions().stream()
+								.filter(t -> t.hasOrigin(state))
+								.filter(t -> t.isEmpty())
+								.collect(Collectors.toList());
 	}
 
 	/**
