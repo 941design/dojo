@@ -25,7 +25,7 @@ public class DotFileBuilderTest {
 	private static final String S3 = "S3";
 	private static final String TOKEN = "foobar";
 
-	private static Matcher<String> matchesPattern(String regex, int flags) {
+	private static Matcher<String> matchesPattern(final String regex, final int flags) {
 		final Pattern pattern = Pattern.compile(regex, flags);
 		return new BaseMatcher<String>() {
 
@@ -38,8 +38,7 @@ public class DotFileBuilderTest {
 
 			@Override
 			public void describeTo(Description description) {
-				// TODO Auto-generated method stub
-				throw new RuntimeException("TODO");
+				description.appendValue(regex);
 			}
 		};
 	}
