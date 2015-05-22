@@ -18,7 +18,7 @@ import de.markusrother.automata.NonDeterministicFiniteAutomaton;
 import de.markusrother.automata.exceptions.NoAcceptingStatesException;
 import de.markusrother.automata.exceptions.NoStartStateException;
 
-public class DotFileBuilderTest {
+public class FiniteAutomatonGraphvizBuilderTest {
 
 	private static final String S1 = "S1";
 	private static final String S2 = "S2";
@@ -47,7 +47,7 @@ public class DotFileBuilderTest {
 	public void testAutomatonNeedsStartState() throws Exception {
 		final FiniteAutomaton<String> dfa = new DeterministicFiniteAutomaton<String>();
 		final Writer out = Mockito.mock(Writer.class);
-		DotFileBuilder.write(dfa, out);
+		FiniteAutomatonGraphvizBuilder.write(dfa, out);
 	}
 
 	@Test(expected = NoAcceptingStatesException.class)
@@ -56,7 +56,7 @@ public class DotFileBuilderTest {
 		dfa.createStates(S1)
 			.setStartState(S1);
 		final Writer out = Mockito.mock(Writer.class);
-		DotFileBuilder.write(dfa, out);
+		FiniteAutomatonGraphvizBuilder.write(dfa, out);
 	}
 
 	@Test
@@ -66,7 +66,7 @@ public class DotFileBuilderTest {
 			.setStartState(S1)
 			.addAcceptingStates(S1);
 		final Writer out = Mockito.mock(Writer.class);
-		DotFileBuilder.write(dfa, out);
+		FiniteAutomatonGraphvizBuilder.write(dfa, out);
 		Mockito.verify(out, Mockito.times(1))
 				.flush();
 	}
@@ -78,7 +78,7 @@ public class DotFileBuilderTest {
 			.setStartState(S1)
 			.addAcceptingStates(S1);
 		final Writer out = Mockito.mock(Writer.class);
-		DotFileBuilder.write(dfa, out);
+		FiniteAutomatonGraphvizBuilder.write(dfa, out);
 		Mockito.verify(out, Mockito.times(1))
 				.close();
 	}
@@ -90,7 +90,7 @@ public class DotFileBuilderTest {
 			.setStartState(S1)
 			.addAcceptingStates(S1);
 		final Writer out = new StringWriter();
-		DotFileBuilder.write(dfa, out);
+		FiniteAutomatonGraphvizBuilder.write(dfa, out);
 		assertThat(out.toString(),
 				matchesPattern("^digraph \\w* \\{\\n\\trankdir=LR;\\n\\tsize=\"\\d+(\\.\\d+)?\".*", Pattern.DOTALL));
 	}
@@ -102,7 +102,7 @@ public class DotFileBuilderTest {
 			.setStartState(S1)
 			.addAcceptingStates(S3);
 		final Writer out = new StringWriter();
-		DotFileBuilder.write(dfa, out);
+		FiniteAutomatonGraphvizBuilder.write(dfa, out);
 		assertThat(out.toString(),
 				matchesPattern(".+node \\[shape=circle, style=solid\\]; " + S1 + " " + S2 + ";\\n.*", Pattern.DOTALL));
 	}
@@ -114,7 +114,7 @@ public class DotFileBuilderTest {
 			.setStartState(S1)
 			.addAcceptingStates(S1);
 		final Writer out = new StringWriter();
-		DotFileBuilder.write(dfa, out);
+		FiniteAutomatonGraphvizBuilder.write(dfa, out);
 		assertThat(out.toString(),
 				matchesPattern(".+node \\[shape=point, style=invis\\]; virtual_start_state;\\n.*", Pattern.DOTALL));
 		assertThat(out.toString(), matchesPattern(".+virtual_start_state -> " + S1 + ";\\n.*", Pattern.DOTALL));
@@ -127,7 +127,7 @@ public class DotFileBuilderTest {
 			.setStartState(S1)
 			.addAcceptingStates(S1, S2);
 		final Writer out = new StringWriter();
-		DotFileBuilder.write(dfa, out);
+		FiniteAutomatonGraphvizBuilder.write(dfa, out);
 		assertThat(out.toString(),
 				matchesPattern(".+node \\[shape=doublecircle, style=solid\\]; " + S1 + " " + S2 + ";\\n.*",
 						Pattern.DOTALL));
@@ -142,7 +142,7 @@ public class DotFileBuilderTest {
 			.createTransition(S1, S2, TOKEN)
 			.createTransition(S1, S1, TOKEN);
 		final Writer out = new StringWriter();
-		DotFileBuilder.write(dfa, out);
+		FiniteAutomatonGraphvizBuilder.write(dfa, out);
 		assertThat(out.toString(),
 				matchesPattern(".*" + S1 + " -> " + S2 + " \\[label=\"" + TOKEN + "\"\\];.*", Pattern.DOTALL));
 	}
@@ -155,7 +155,7 @@ public class DotFileBuilderTest {
 			.addAcceptingStates(S2)
 			.createEmptyTransition(S1, S2);
 		final Writer out = new StringWriter();
-		DotFileBuilder.write(dfa, out);
+		FiniteAutomatonGraphvizBuilder.write(dfa, out);
 		assertThat(out.toString(),
 				matchesPattern(".*" + S1 + " -> " + S2 + " \\[label=\"€\"\\];.*", Pattern.DOTALL));
 	}
@@ -169,7 +169,7 @@ public class DotFileBuilderTest {
 			.createTransition(S1, S2, TOKEN)
 			.createTransition(S1, S1, TOKEN);
 		final Writer out = new StringWriter();
-		DotFileBuilder.write(dfa, out);
+		FiniteAutomatonGraphvizBuilder.write(dfa, out);
 		Runtime.getRuntime()
 				.exec("dot -Tpng < \"" + out.toString() + "\" > /tmp/foobar.png");
 		final Process process = Runtime.getRuntime()
