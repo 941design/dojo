@@ -2,12 +2,9 @@ package de.markusrother.automata;
 
 import java.util.Collection;
 
-import de.markusrother.automata.exceptions.DuplicateStateException;
-import de.markusrother.automata.exceptions.DuplicateTransitionException;
 import de.markusrother.automata.exceptions.InvalidOriginException;
 import de.markusrother.automata.exceptions.NoAcceptingStatesException;
 import de.markusrother.automata.exceptions.NoStartStateException;
-import de.markusrother.automata.exceptions.NoSuchStateException;
 import de.markusrother.automata.exceptions.NotInAlphabetException;
 
 /**
@@ -20,29 +17,17 @@ public interface FiniteAutomaton<T> extends TransitionFunction<T> {
 	 */
 	Collection<T> getAlphabet();
 
-	FiniteAutomaton<T> createStates(String... stateLabels) throws DuplicateStateException;
-
 	Collection<AutomatonState> getStates();
 
 	AutomatonState getState(String label);
 
 	AutomatonState getStartState();
 
-	FiniteAutomaton<T> setStartState(String startStateLabel) throws NoSuchStateException;
-
 	boolean hasStartState();
-
-	FiniteAutomaton<T> addAcceptingStates(String... acceptingStateLabels) throws NoSuchStateException;
 
 	Collection<AutomatonState> getAcceptingStates();
 
 	boolean hasAcceptingStates();
-
-	FiniteAutomaton<T> createTransition(String originLabel, String targetLabel, T token) throws NoSuchStateException,
-			DuplicateTransitionException;
-
-	FiniteAutomaton<T> createEmptyTransition(String originLabel, String targetLabel) throws NoSuchStateException,
-			DuplicateTransitionException;
 
 	/**
 	 * @return Collection of all {@link de.markusrother.automata.AutomatonTransition}s for given automaton.

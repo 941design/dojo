@@ -14,6 +14,7 @@ import org.mockito.Mockito;
 
 import de.markusrother.automata.DeterministicFiniteAutomaton;
 import de.markusrother.automata.FiniteAutomaton;
+import de.markusrother.automata.MutableFiniteAutomaton;
 import de.markusrother.automata.NonDeterministicFiniteAutomaton;
 import de.markusrother.automata.exceptions.NoAcceptingStatesException;
 import de.markusrother.automata.exceptions.NoStartStateException;
@@ -52,7 +53,7 @@ public class FiniteAutomatonGraphvizBuilderTest {
 
 	@Test(expected = NoAcceptingStatesException.class)
 	public void testAutomatonNeedsAcceptingStates() throws Exception {
-		final FiniteAutomaton<String> dfa = new DeterministicFiniteAutomaton<String>();
+		final MutableFiniteAutomaton<String> dfa = new DeterministicFiniteAutomaton<String>();
 		dfa.createStates(S1)
 			.setStartState(S1);
 		final Writer out = Mockito.mock(Writer.class);
@@ -61,7 +62,7 @@ public class FiniteAutomatonGraphvizBuilderTest {
 
 	@Test
 	public void testWriteDotFlushesWriter() throws Exception {
-		final FiniteAutomaton<String> dfa = new DeterministicFiniteAutomaton<String>();
+		final MutableFiniteAutomaton<String> dfa = new DeterministicFiniteAutomaton<String>();
 		dfa.createStates(S1)
 			.setStartState(S1)
 			.addAcceptingStates(S1);
@@ -73,7 +74,7 @@ public class FiniteAutomatonGraphvizBuilderTest {
 
 	@Test
 	public void testWriteDotClosesWriter() throws Exception {
-		final FiniteAutomaton<String> dfa = new DeterministicFiniteAutomaton<String>();
+		final MutableFiniteAutomaton<String> dfa = new DeterministicFiniteAutomaton<String>();
 		dfa.createStates(S1)
 			.setStartState(S1)
 			.addAcceptingStates(S1);
@@ -85,7 +86,7 @@ public class FiniteAutomatonGraphvizBuilderTest {
 
 	@Test
 	public void testWriteHeader() throws Exception {
-		final FiniteAutomaton<String> dfa = new DeterministicFiniteAutomaton<String>();
+		final MutableFiniteAutomaton<String> dfa = new DeterministicFiniteAutomaton<String>();
 		dfa.createStates(S1)
 			.setStartState(S1)
 			.addAcceptingStates(S1);
@@ -97,7 +98,7 @@ public class FiniteAutomatonGraphvizBuilderTest {
 
 	@Test
 	public void testWriteStates() throws Exception {
-		final FiniteAutomaton<String> dfa = new DeterministicFiniteAutomaton<String>();
+		final MutableFiniteAutomaton<String> dfa = new DeterministicFiniteAutomaton<String>();
 		dfa.createStates(S1, S2, S3)
 			.setStartState(S1)
 			.addAcceptingStates(S3);
@@ -109,7 +110,7 @@ public class FiniteAutomatonGraphvizBuilderTest {
 
 	@Test
 	public void testWriteVirtualStartState() throws Exception {
-		final FiniteAutomaton<String> dfa = new DeterministicFiniteAutomaton<String>();
+		final MutableFiniteAutomaton<String> dfa = new DeterministicFiniteAutomaton<String>();
 		dfa.createStates(S1)
 			.setStartState(S1)
 			.addAcceptingStates(S1);
@@ -122,7 +123,7 @@ public class FiniteAutomatonGraphvizBuilderTest {
 
 	@Test
 	public void testWriteAcceptingStates() throws Exception {
-		final FiniteAutomaton<String> dfa = new DeterministicFiniteAutomaton<String>();
+		final MutableFiniteAutomaton<String> dfa = new DeterministicFiniteAutomaton<String>();
 		dfa.createStates(S1, S2)
 			.setStartState(S1)
 			.addAcceptingStates(S1, S2);
@@ -135,7 +136,7 @@ public class FiniteAutomatonGraphvizBuilderTest {
 
 	@Test
 	public void testWriteTransitions() throws Exception {
-		final FiniteAutomaton<String> dfa = new DeterministicFiniteAutomaton<String>();
+		final MutableFiniteAutomaton<String> dfa = new DeterministicFiniteAutomaton<String>();
 		dfa.createStates(S1, S2)
 			.setStartState(S1)
 			.addAcceptingStates(S2)
@@ -162,7 +163,7 @@ public class FiniteAutomatonGraphvizBuilderTest {
 
 	@Test
 	public void testShow() throws Exception {
-		final FiniteAutomaton<String> dfa = new DeterministicFiniteAutomaton<String>();
+		final MutableFiniteAutomaton<String> dfa = new DeterministicFiniteAutomaton<String>();
 		dfa.createStates(S1, S2)
 			.setStartState(S1)
 			.addAcceptingStates(S2)

@@ -23,7 +23,7 @@ import de.markusrother.automata.exceptions.NotInAlphabetException;
 public class NonDeterministicFiniteAutomaton<T> extends AbstractFiniteAutomaton<T> {
 
 	@Override
-	public FiniteAutomaton<T> createEmptyTransition(String originLabel, String targetLabel)
+	public MutableFiniteAutomaton<T> createEmptyTransition(String originLabel, String targetLabel)
 			throws NoSuchStateException, DuplicateTransitionException {
 		final AutomatonState origin = getExistingState(originLabel);
 		final AutomatonState target = getExistingState(targetLabel);
@@ -33,7 +33,7 @@ public class NonDeterministicFiniteAutomaton<T> extends AbstractFiniteAutomaton<
 		return createEmptyTransition(origin, target);
 	}
 
-	private FiniteAutomaton<T> createEmptyTransition(AutomatonState origin, AutomatonState target) {
+	private MutableFiniteAutomaton<T> createEmptyTransition(AutomatonState origin, AutomatonState target) {
 		final AutomatonTransition<T> transition = new EmptyAutomatonTransitionImpl<T>(origin, target);
 		addTransition(transition);
 		return this;

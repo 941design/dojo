@@ -23,7 +23,7 @@ public class DeterministicFiniteAutomaton<T> extends AbstractFiniteAutomaton<T> 
 
 	@SuppressWarnings("unused")
 	@Override
-	public FiniteAutomaton<T> createEmptyTransition(String originLabel, String targetLabel) {
+	public MutableFiniteAutomaton<T> createEmptyTransition(String originLabel, String targetLabel) {
 		throw new UnsupportedOperationException();
 	}
 

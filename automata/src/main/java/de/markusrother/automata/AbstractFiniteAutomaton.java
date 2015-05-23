@@ -14,7 +14,7 @@ import de.markusrother.automata.exceptions.NotInAlphabetException;
 /**
  * @param <T> - the generic token/alphabet type.
  */
-public abstract class AbstractFiniteAutomaton<T> implements FiniteAutomaton<T> {
+public abstract class AbstractFiniteAutomaton<T> implements MutableFiniteAutomaton<T> {
 
 	private final Collection<AutomatonState> states;
 	private final Collection<AutomatonTransition<T>> transitions;
@@ -33,7 +33,7 @@ public abstract class AbstractFiniteAutomaton<T> implements FiniteAutomaton<T> {
 	}
 
 	@Override
-	public FiniteAutomaton<T> createStates(String... labels) throws DuplicateStateException {
+	public MutableFiniteAutomaton<T> createStates(String... labels) throws DuplicateStateException {
 		for (String label : labels) {
 			createState(label);
 		}
@@ -118,7 +118,7 @@ public abstract class AbstractFiniteAutomaton<T> implements FiniteAutomaton<T> {
 	}
 
 	@Override
-	public FiniteAutomaton<T> setStartState(String startStateLabel) throws NoSuchStateException {
+	public MutableFiniteAutomaton<T> setStartState(String startStateLabel) throws NoSuchStateException {
 		startState = getExistingState(startStateLabel);
 		return this;
 	}
@@ -142,7 +142,7 @@ public abstract class AbstractFiniteAutomaton<T> implements FiniteAutomaton<T> {
 	}
 
 	@Override
-	public FiniteAutomaton<T> addAcceptingStates(String... labels) throws NoSuchStateException {
+	public MutableFiniteAutomaton<T> addAcceptingStates(String... labels) throws NoSuchStateException {
 		for (String label : labels) {
 			addAcceptingState(label);
 		}
@@ -161,7 +161,7 @@ public abstract class AbstractFiniteAutomaton<T> implements FiniteAutomaton<T> {
 	}
 
 	@Override
-	public FiniteAutomaton<T> createTransition(String originLabel, String targetLabel, T token)
+	public MutableFiniteAutomaton<T> createTransition(String originLabel, String targetLabel, T token)
 			throws NoSuchStateException, DuplicateTransitionException {
 		if (token == null) {
 			throw new IllegalArgumentException();

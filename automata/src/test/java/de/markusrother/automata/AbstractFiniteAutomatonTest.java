@@ -40,9 +40,9 @@ public abstract class AbstractFiniteAutomatonTest {
 	protected static final AutomatonState NO_STATE = null;
 	protected static final Object NO_TOKEN = null;
 
-	protected AbstractFiniteAutomaton<Object> automaton;
+	protected MutableFiniteAutomaton<Object> automaton;
 
-	abstract <T> AbstractFiniteAutomaton<T> createAutomaton();
+	abstract <T> MutableFiniteAutomaton<T> createAutomaton();
 
 	@Test
 	public void testNewAutomatonHasNoStates() throws Exception {
@@ -334,7 +334,7 @@ public abstract class AbstractFiniteAutomatonTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testCopyAlphabet() throws Exception {
-		final FiniteAutomaton<Integer> automaton = createAutomaton();
+		final MutableFiniteAutomaton<Integer> automaton = createAutomaton();
 		automaton.createStates(S1, S2)
 					.setStartState(S1)
 					.createTransition(S1, S2, 0)
@@ -360,7 +360,7 @@ public abstract class AbstractFiniteAutomatonTest {
 					.setStartState(S1)
 					.createTransition(S1, S2, TOKEN)
 					.createTransition(S2, S1, TOKEN);
-		final FiniteAutomaton<Object> other = createAutomaton();
+		final MutableFiniteAutomaton<Object> other = createAutomaton();
 		other.createStates(T1, T2)
 				.setStartState(T1)
 				.createTransition(T1, T2, TOKEN)
@@ -372,7 +372,7 @@ public abstract class AbstractFiniteAutomatonTest {
 	public void testAllAutomataWithoutStartStatesAreEqual() throws Exception {
 		automaton.createStates(S1)
 					.createTransition(S1, S1, "foobar");
-		final FiniteAutomaton<Object> other = createAutomaton();
+		final MutableFiniteAutomaton<Object> other = createAutomaton();
 		other.createStates(T1)
 				.createTransition(T1, T1, 23);
 		Assert.assertEquals(automaton, other);
@@ -383,7 +383,7 @@ public abstract class AbstractFiniteAutomatonTest {
 		automaton.createStates(S1)
 					.setStartState(S1)
 					.createTransition(S1, S1, TOKEN);
-		final FiniteAutomaton<Object> other = createAutomaton();
+		final MutableFiniteAutomaton<Object> other = createAutomaton();
 		other.createStates(S1)
 				.createTransition(S1, S1, TOKEN);
 		Assert.assertNotEquals(automaton, other);
@@ -393,7 +393,7 @@ public abstract class AbstractFiniteAutomatonTest {
 	public void testCompareAutomatonWithoutStartState() throws Exception {
 		automaton.createStates(S1)
 					.createTransition(S1, S1, TOKEN);
-		final FiniteAutomaton<Object> other = createAutomaton();
+		final MutableFiniteAutomaton<Object> other = createAutomaton();
 		other.createStates(S1)
 				.setStartState(S1)
 				.createTransition(S1, S1, TOKEN);
@@ -406,7 +406,7 @@ public abstract class AbstractFiniteAutomatonTest {
 					.setStartState(S1)
 					.addAcceptingStates(S1)
 					.createTransition(S1, S2, TOKEN);
-		final FiniteAutomaton<Object> other = createAutomaton();
+		final MutableFiniteAutomaton<Object> other = createAutomaton();
 		other.createStates(T1, T2)
 				.setStartState(T1)
 				.addAcceptingStates(T2)
@@ -419,7 +419,7 @@ public abstract class AbstractFiniteAutomatonTest {
 		automaton.createStates(S1)
 					.setStartState(S1)
 					.createTransition(S1, S1, "foobar");
-		final FiniteAutomaton<Object> other = createAutomaton();
+		final MutableFiniteAutomaton<Object> other = createAutomaton();
 		other.createStates(T1)
 				.setStartState(T1)
 				.createTransition(T1, T1, 23);
@@ -432,7 +432,7 @@ public abstract class AbstractFiniteAutomatonTest {
 					.setStartState(S1)
 					.createTransition(S1, S2, TOKEN)
 					.createTransition(S2, S2, TOKEN);
-		final FiniteAutomaton<Object> other = createAutomaton();
+		final MutableFiniteAutomaton<Object> other = createAutomaton();
 		other.createStates(S1, S2)
 				.setStartState(S1)
 				.createTransition(S1, S2, TOKEN);
@@ -446,7 +446,7 @@ public abstract class AbstractFiniteAutomatonTest {
 					.addAcceptingStates(S1)
 					.createTransition(S1, S1, TOKEN);
 		// This automaton is logically(!) equivalent:
-		final FiniteAutomaton<Object> other = createAutomaton();
+		final MutableFiniteAutomaton<Object> other = createAutomaton();
 		other.createStates(T1, T2)
 				.setStartState(T1)
 				.addAcceptingStates(T1, T2)
@@ -464,7 +464,7 @@ public abstract class AbstractFiniteAutomatonTest {
 					.createTransition(S1, S2, 0)
 					.createTransition(S2, S2, 1)
 					.createTransition(S2, S1, 0);
-		final FiniteAutomaton<Object> other = createAutomaton();
+		final MutableFiniteAutomaton<Object> other = createAutomaton();
 		other.createStates(T1, T2)
 				.setStartState(T1)
 				.addAcceptingStates(T1)
@@ -479,7 +479,7 @@ public abstract class AbstractFiniteAutomatonTest {
 	@Test
 	public void testStructuralEqualityWithUnreachableStates() throws Exception {
 		automaton.createStates(S1, S2);
-		final FiniteAutomaton<Object> other = createAutomaton();
+		final MutableFiniteAutomaton<Object> other = createAutomaton();
 		other.createStates(T1, T2);
 		Assert.assertEquals(automaton, other);
 	}
@@ -488,7 +488,7 @@ public abstract class AbstractFiniteAutomatonTest {
 	@Test
 	public void testStructuralInequalityWithUnreachableStates() throws Exception {
 		automaton.createStates(S1);
-		final FiniteAutomaton<Object> other = createAutomaton();
+		final MutableFiniteAutomaton<Object> other = createAutomaton();
 		other.createStates(T1, T2);
 		Assert.assertNotEquals(automaton, other);
 	}
