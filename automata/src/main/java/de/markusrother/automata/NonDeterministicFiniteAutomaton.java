@@ -30,6 +30,10 @@ public class NonDeterministicFiniteAutomaton<T> extends AbstractFiniteAutomaton<
 		if (hasTransition(origin, target)) {
 			throw new DuplicateEmptyTransitionException(originLabel, targetLabel);
 		}
+		return createEmptyTransition(origin, target);
+	}
+
+	private FiniteAutomaton<T> createEmptyTransition(AutomatonState origin, AutomatonState target) {
 		final AutomatonTransition<T> transition = new EmptyAutomatonTransitionImpl<T>(origin, target);
 		addTransition(transition);
 		return this;
@@ -50,7 +54,9 @@ public class NonDeterministicFiniteAutomaton<T> extends AbstractFiniteAutomaton<
 
 	@Override
 	public FiniteAutomaton<T> copy() {
-		return copyInto(new NonDeterministicFiniteAutomaton<T>());
+		final NonDeterministicFiniteAutomaton<T> copy = new NonDeterministicFiniteAutomaton<T>();
+		copy.copyFrom(this);
+		return copy;
 	}
 
 	/**

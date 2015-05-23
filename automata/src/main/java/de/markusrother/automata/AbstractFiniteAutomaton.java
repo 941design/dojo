@@ -50,15 +50,25 @@ public abstract class AbstractFiniteAutomaton<T> implements FiniteAutomaton<T> {
 			throw new DuplicateStateException(label);
 		}
 		final AutomatonState state = new AutomatonStateImpl(label);
-		states.add(state);
+		addState(state);
 		return this;
 	}
 
-	protected boolean hasState(String label) {
-		return getState(label) != null;
+	protected void addState(AutomatonState state) {
+		this.states.add(state);
 	}
 
-	protected AutomatonState getState(String label) {
+	protected void addStates(Collection<AutomatonState> states) {
+		this.states.addAll(states);
+	}
+
+	protected boolean hasState(String label) {
+		return states.stream()
+						.anyMatch(s -> s.hasLabel(label));
+			}
+
+	@Override
+	public AutomatonState getState(String label) {
 		return states.stream()
 						.filter(s -> s.hasLabel(label))
 						.findFirst()
@@ -158,12 +168,24 @@ public abstract class AbstractFiniteAutomaton<T> implements FiniteAutomaton<T> {
 		}
 		final AutomatonTransition<T> transition = new AutomatonTransitionImpl<T>(origin, target, token);
 		addTransition(transition);
-		alphabet.add(token);
+		addToken(token);
 		return this;
+	}
+
+	protected void addToken(T token) {
+		alphabet.add(token);
+	}
+
+	protected void addTokens(Collection<T> tokens) {
+		alphabet.addAll(tokens);
 	}
 
 	protected void addTransition(final AutomatonTransition<T> transition) {
 		transitions.add(transition);
+	}
+
+	protected void addTransitions(Collection<AutomatonTransition<T>> transitions) {
+		this.transitions.addAll(transitions);
 	}
 
 	private boolean hasTransition(AutomatonState origin, AutomatonState target, T token) {
@@ -206,40 +228,47 @@ public abstract class AbstractFiniteAutomaton<T> implements FiniteAutomaton<T> {
 							.orElse(getNullTransition());
 	}
 
-	protected FiniteAutomaton<T> copyInto(AbstractFiniteAutomaton<T> copy) {
+	protected void copyFrom(FiniteAutomaton<T> other) {
 		try {
-			copyStatesInto(copy);
-			copyTransitionsInto(copy);
-			return copy;
+			copyStatesFrom(other);
+			copyStartStateFrom(other);
+			copyAcceptingStatesFrom(other);
+			copyTransitionsFrom(other);
 		}
 		catch (NoSuchStateException | DuplicateStateException | DuplicateTransitionException e) {
 			throw new IllegalStateException(e);
 		}
 	}
 
-	private void copyStatesInto(final AbstractFiniteAutomaton<T> copy) throws NoSuchStateException,
-			DuplicateStateException {
-		for (AutomatonState state : states) {
+	protected void copyStatesFrom(final FiniteAutomaton<T> other) throws DuplicateStateException {
+		for (AutomatonState state : other.getStates()) {
 			final String stateLabel = state.getLabel();
-			copy.createState(stateLabel);
-			// Not based on getAcceptingStates() for slightly better performance:
-			if (state.isAccepting()) {
-				copy.addAcceptingState(stateLabel);
-			}
-		}
-		if (hasStartState()) {
-			final String startStateLabel = startState.getLabel();
-			copy.setStartState(startStateLabel);
+			createState(stateLabel);
 		}
 	}
 
-	private void copyTransitionsInto(AbstractFiniteAutomaton<T> copy) throws NoSuchStateException,
+	protected void copyStartStateFrom(FiniteAutomaton<T> other) throws NoSuchStateException {
+		if (other.hasStartState()) {
+			final String startStateLabel = other.getStartState()
+												.getLabel();
+			setStartState(startStateLabel);
+		}
+	}
+
+	protected void copyAcceptingStatesFrom(FiniteAutomaton<T> other) throws NoSuchStateException {
+		for (AutomatonState state : other.getAcceptingStates()) {
+			final String stateLabel = state.getLabel();
+			addAcceptingState(stateLabel);
+		}
+	}
+
+	protected void copyTransitionsFrom(FiniteAutomaton<T> other) throws NoSuchStateException,
 			DuplicateTransitionException {
-		for (AutomatonTransition<T> transition : transitions) {
+		for (AutomatonTransition<T> transition : other.getTransitions()) {
 			final String originLabel = transition.getOriginLabel();
 			final String targetLabel = transition.getTargetLabel();
 			final T token = transition.getToken();
-			copy.createTransition(originLabel, targetLabel, token);
+			createTransition(originLabel, targetLabel, token);
 		}
 	}
 
