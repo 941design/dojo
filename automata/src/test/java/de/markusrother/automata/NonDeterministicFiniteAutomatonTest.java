@@ -1,6 +1,8 @@
 package de.markusrother.automata;
 
 import static de.markusrother.automata.AutomatonStateMatcher.isState;
+import static de.markusrother.automata.EitherOrAccepting.ACCEPTING;
+import static de.markusrother.automata.EitherOrAccepting.NOT_ACCEPTING;
 import static org.hamcrest.Matchers.contains;
 
 import org.junit.Assert;
@@ -21,14 +23,17 @@ public class NonDeterministicFiniteAutomatonTest extends AbstractFiniteAutomaton
 
 	@Test
 	public void testCreateEmptyTransition() throws Exception {
-		automaton.createStates(S1, S2)
+		automaton.createState(S1, NOT_ACCEPTING)
+					.createState(S2, NOT_ACCEPTING)
 					.createEmptyTransition(S1, S2);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testSuccessorsOfEmptyTransition() throws Exception {
-		automaton.createStates(S1, S2, S3)
+		automaton.createState(S1, NOT_ACCEPTING)
+					.createState(S2, NOT_ACCEPTING)
+					.createState(S3, NOT_ACCEPTING)
 					.createTransition(S1, S2, TOKEN)
 					.createEmptyTransition(S2, S2)
 					.createEmptyTransition(S2, S3);
@@ -38,7 +43,7 @@ public class NonDeterministicFiniteAutomatonTest extends AbstractFiniteAutomaton
 
 	@Test
 	public void testSingleCircularEmptyTransition() throws Exception {
-		automaton.createStates(S1)
+		automaton.createState(S1, NOT_ACCEPTING)
 					.createTransition(S1, S1, TOKEN)
 					.createEmptyTransition(S1, S1);
 		final AutomatonState s1 = automaton.getState(S1);
@@ -47,9 +52,11 @@ public class NonDeterministicFiniteAutomatonTest extends AbstractFiniteAutomaton
 
 	@Test
 	public void testMultipleCircularEmptyTransitions() throws Exception {
-		automaton.createStates(S1, S2, S3, S4)
+		automaton.createState(S1, NOT_ACCEPTING)
+					.createState(S2, NOT_ACCEPTING)
+					.createState(S3, NOT_ACCEPTING)
+					.createState(S4, ACCEPTING)
 					.setStartState(S1)
-					.addAcceptingStates(S4)
 					.createTransition(S1, S2, 1)
 					.createEmptyTransition(S2, S3)
 					.createEmptyTransition(S3, S2)
@@ -65,9 +72,10 @@ public class NonDeterministicFiniteAutomatonTest extends AbstractFiniteAutomaton
 
 	@Test
 	public void testExpandStartState() throws Exception {
-		automaton.createStates(S1, S2, S3)
+		automaton.createState(S1, NOT_ACCEPTING)
+					.createState(S2, NOT_ACCEPTING)
+					.createState(S3, ACCEPTING)
 					.setStartState(S1)
-					.addAcceptingStates(S3)
 					.createEmptyTransition(S1, S2)
 					.createTransition(S2, S3, TOKEN);
 		assertRejects();
@@ -76,9 +84,10 @@ public class NonDeterministicFiniteAutomatonTest extends AbstractFiniteAutomaton
 
 	@Test
 	public void testAcceptsEmptyWordIfStartStateHasEmptyTransitionToAcceptingState() throws Exception {
-		automaton.createStates(S1, S2, S3)
+		automaton.createState(S1, NOT_ACCEPTING)
+					.createState(S2, NOT_ACCEPTING)
+					.createState(S3, ACCEPTING)
 					.setStartState(S1)
-					.addAcceptingStates(S3)
 					.createEmptyTransition(S1, S2)
 					.createEmptyTransition(S2, S3);
 		assertAccepts();

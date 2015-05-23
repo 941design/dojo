@@ -2,6 +2,8 @@ package de.markusrother.automata;
 
 import static de.markusrother.automata.AutomatonStateMatcher.isState;
 import static de.markusrother.automata.AutomatonTransitionMatcher.isTransition;
+import static de.markusrother.automata.EitherOrAccepting.ACCEPTING;
+import static de.markusrother.automata.EitherOrAccepting.NOT_ACCEPTING;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
@@ -40,7 +42,7 @@ public abstract class AbstractFiniteAutomatonTest {
 	protected static final AutomatonState NO_STATE = null;
 	protected static final Object NO_TOKEN = null;
 
-	protected MutableFiniteAutomaton<Object> automaton;
+	protected AbstractFiniteAutomaton<Object> automaton;
 
 	abstract <T> MutableFiniteAutomaton<T> createAutomaton();
 
@@ -56,7 +58,7 @@ public abstract class AbstractFiniteAutomatonTest {
 
 	@Test(expected = NoAcceptingStatesException.class)
 	public void testAcceptanceRequiresAcceptingStates() throws Exception {
-		automaton.createStates(S1)
+		automaton.createState(S1, NOT_ACCEPTING)
 					.setStartState(S1);
 		automaton.accepts(new ArrayList<Object>());
 	}
@@ -78,27 +80,26 @@ public abstract class AbstractFiniteAutomatonTest {
 
 	@Test
 	public void testAutomatonStartsInAcceptingState() throws Exception {
-		automaton.createStates(S1)
-					.setStartState(S1)
-					.addAcceptingStates(S1);
+		automaton.createState(S1, ACCEPTING)
+					.setStartState(S1);
 		assertAccepts();
 	}
 
 	@Test
 	public void testCreateState() throws Exception {
-		automaton.createStates(S1);
+		automaton.createState(S1, NOT_ACCEPTING);
 		Assert.assertThat(automaton.getStates(), contains(isState(S1)));
 	}
 
 	@Test(expected = DuplicateStateException.class)
 	public void testCreateDuplicateState() throws Exception {
-		automaton.createStates(S1)
-					.createStates(S1);
+		automaton.createState(S1, NOT_ACCEPTING)
+					.createState(S1, NOT_ACCEPTING);
 	}
 
 	@Test
 	public void testCreateStartState() throws Exception {
-		automaton.createStates(S1)
+		automaton.createState(S1, NOT_ACCEPTING)
 					.setStartState(S1);
 		Assert.assertThat(automaton.getStartState(), isState(S1));
 	}
@@ -110,26 +111,22 @@ public abstract class AbstractFiniteAutomatonTest {
 
 	@Test
 	public void testCreateAcceptingState() throws Exception {
-		automaton.createStates(S1)
-					.addAcceptingStates(S1);
+		automaton.createState(S1, ACCEPTING);
 		Assert.assertThat(automaton.getAcceptingStates(), contains(isState(S1)));
-	}
-
-	@Test(expected = NoSuchStateException.class)
-	public void testCreateInexistentAcceptingState() throws Exception {
-		automaton.addAcceptingStates(S1);
 	}
 
 	@Test
 	public void testCreateTransition() throws Exception {
-		automaton.createStates(S1, S2)
+		automaton.createState(S1, NOT_ACCEPTING)
+					.createState(S2, ACCEPTING)
 					.createTransition(S1, S2, TOKEN);
 		Assert.assertThat(automaton.getTransitions(), contains(isTransition(S1, S2, TOKEN)));
 	}
 
 	@Test
 	public void testCreateTransitionExtendsAlphabet() throws Exception {
-		automaton.createStates(S1, S2)
+		automaton.createState(S1, NOT_ACCEPTING)
+					.createState(S2, ACCEPTING)
 					.createTransition(S1, S2, TOKEN);
 		Assert.assertThat(automaton.getAlphabet(), contains(is(TOKEN)));
 	}
@@ -141,13 +138,13 @@ public abstract class AbstractFiniteAutomatonTest {
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testGetTransitionThrowsExceptionIfTokenIsNull() throws Exception {
-		automaton.createStates(S1)
+		automaton.createState(S1, NOT_ACCEPTING)
 					.getTransition(automaton.getState(S1), NO_TOKEN);
 	}
 
 	@Test(expected = NotInAlphabetException.class)
 	public void testGetTransitionThrowsExceptionIfTokenDoesNotBelongToAlphabet() throws Exception {
-		automaton.createStates(S1)
+		automaton.createState(S1, NOT_ACCEPTING)
 					.getTransition(automaton.getState(S1), new Object());
 	}
 
@@ -163,19 +160,20 @@ public abstract class AbstractFiniteAutomatonTest {
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testGetSuccessorsThrowsExceptionIfTokenIsNull() throws Exception {
-		automaton.createStates(S1)
+		automaton.createState(S1, NOT_ACCEPTING)
 					.getSuccessors(automaton.getState(S1), NO_TOKEN);
 	}
 
 	@Test(expected = NotInAlphabetException.class)
 	public void testGetSuccessorsThrowsExceptionIfTokenDoesNotBelongToAlphabet() throws Exception {
-		automaton.createStates(S1)
+		automaton.createState(S1, NOT_ACCEPTING)
 					.getSuccessors(automaton.getState(S1), new Object());
 	}
 
 	@Test
 	public void testAlphabetIsSet() throws Exception {
-		automaton.createStates(S1, S2)
+		automaton.createState(S1, NOT_ACCEPTING)
+					.createState(S2, ACCEPTING)
 					.createTransition(S1, S2, TOKEN)
 					.createTransition(S2, S2, TOKEN);
 		Assert.assertThat(automaton.getAlphabet(), contains(is(TOKEN)));
@@ -183,7 +181,8 @@ public abstract class AbstractFiniteAutomatonTest {
 
 	@Test(expected = DuplicateTransitionException.class)
 	public void testCreateDuplicateTransition() throws Exception {
-		automaton.createStates(S1, S2)
+		automaton.createState(S1, NOT_ACCEPTING)
+					.createState(S2, ACCEPTING)
 					.createTransition(S1, S2, TOKEN)
 					.createTransition(S1, S2, TOKEN);
 	}
@@ -195,33 +194,34 @@ public abstract class AbstractFiniteAutomatonTest {
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testCreateTransitionWithNullToken() throws Exception {
-		automaton.createStates(S1, S2)
+		automaton.createState(S1, NOT_ACCEPTING)
+					.createState(S2, ACCEPTING)
 					.createTransition(S1, S2, null);
 	}
 
 	@Test
 	public void testAutomatonRejects() throws Exception {
 		// TODO - All states should be connected!
-		automaton.createStates(S1, S2)
-					.setStartState(S1)
-					.addAcceptingStates(S2);
+		automaton.createState(S1, NOT_ACCEPTING)
+					.createState(S2, ACCEPTING)
+					.setStartState(S1);
 		assertRejects();
 	}
 
 	@Test(expected = NotInAlphabetException.class)
 	public void testAutomatonThrowsExceptionForInvalidToken() throws Exception {
 		// TODO - All states should be connected!
-		automaton.createStates(S1, S2)
+		automaton.createState(S1, NOT_ACCEPTING)
+					.createState(S2, ACCEPTING)
 					.setStartState(S1)
-					.addAcceptingStates(S2)
 					.accepts(Arrays.asList(TOKEN));
 	}
 
 	@Test
 	public void testAutomatonAcceptSingleObject() throws Exception {
-		automaton.createStates(S1, S2)
+		automaton.createState(S1, NOT_ACCEPTING)
+					.createState(S2, ACCEPTING)
 					.setStartState(S1)
-					.addAcceptingStates(S2)
 					.createTransition(S1, S2, TOKEN);
 		assertRejects();
 		assertAccepts(TOKEN);
@@ -230,9 +230,9 @@ public abstract class AbstractFiniteAutomatonTest {
 	@Test
 	public void testAutomatonLeavesAcceptingState() throws Exception {
 		final Object token = new Object();
-		automaton.createStates(S1, S2)
+		automaton.createState(S1, NOT_ACCEPTING)
+					.createState(S2, ACCEPTING)
 					.setStartState(S1)
-					.addAcceptingStates(S2)
 					.createTransition(S1, S2, token)
 					.createTransition(S2, S1, token);
 		assertRejects();
@@ -245,9 +245,9 @@ public abstract class AbstractFiniteAutomatonTest {
 	@Test
 	public void testAutomatonLeavesAcceptingStateIntoNullState() throws Exception {
 		final Object token = new Object();
-		automaton.createStates(S1, S2)
+		automaton.createState(S1, NOT_ACCEPTING)
+					.createState(S2, ACCEPTING)
 					.setStartState(S1)
-					.addAcceptingStates(S2)
 					.createTransition(S1, S2, token);
 		assertRejects();
 		assertAccepts(token);
@@ -259,9 +259,9 @@ public abstract class AbstractFiniteAutomatonTest {
 	@Test
 	public void testAutomatonAcceptsInMultipleStates() throws Exception {
 		final Object obj = new Object();
-		automaton.createStates(S1, S2)
+		automaton.createState(S1, ACCEPTING)
+					.createState(S2, ACCEPTING)
 					.setStartState(S1)
-					.addAcceptingStates(S1, S2)
 					.createTransition(S1, S2, obj)
 					.createTransition(S2, S1, obj);
 		assertAccepts();
@@ -271,9 +271,9 @@ public abstract class AbstractFiniteAutomatonTest {
 
 	@Test
 	public void testAutomatonAcceptEvenZeros() throws Exception {
-		automaton.createStates(S1, S2)
+		automaton.createState(S1, ACCEPTING)
+					.createState(S2, NOT_ACCEPTING)
 					.setStartState(S1)
-					.addAcceptingStates(S1)
 					.createTransition(S1, S1, 1)
 					.createTransition(S1, S2, 0)
 					.createTransition(S2, S2, 1)
@@ -295,14 +295,15 @@ public abstract class AbstractFiniteAutomatonTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testCopyStates() throws Exception {
-		automaton.createStates(S1, S2);
+		automaton.createState(S1, NOT_ACCEPTING)
+					.createState(S2, ACCEPTING);
 		final FiniteAutomaton<Object> copy = automaton.copy();
 		Assert.assertThat(copy.getStates(), contains(isState(S1), isState(S2)));
 	}
 
 	@Test
 	public void testCopyStartState() throws Exception {
-		automaton.createStates(S1)
+		automaton.createState(S1, NOT_ACCEPTING)
 					.setStartState(S1);
 		final FiniteAutomaton<Object> copy = automaton.copy();
 		Assert.assertThat(copy.getStartState(), isState(S1));
@@ -311,11 +312,12 @@ public abstract class AbstractFiniteAutomatonTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testCopyAcceptingStates() throws Exception {
-		automaton.createStates(S1, S2, S3)
+		automaton.createState(S1, NOT_ACCEPTING)
+					.createState(S2, ACCEPTING)
+					.createState(S3, ACCEPTING)
 					.setStartState(S1)
 					.createTransition(S1, S2, TOKEN)
-					.createTransition(S2, S3, TOKEN)
-					.addAcceptingStates(S2, S3);
+					.createTransition(S2, S3, TOKEN);
 		final FiniteAutomaton<Object> copy = automaton.copy();
 		Assert.assertThat(copy.getAcceptingStates(), contains(isState(S2), isState(S3)));
 	}
@@ -323,7 +325,8 @@ public abstract class AbstractFiniteAutomatonTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testCopyTransitions() throws Exception {
-		automaton.createStates(S1, S2)
+		automaton.createState(S1, NOT_ACCEPTING)
+					.createState(S2, ACCEPTING)
 					.setStartState(S1)
 					.createTransition(S1, S2, TOKEN)
 					.createTransition(S2, S2, TOKEN);
@@ -335,7 +338,8 @@ public abstract class AbstractFiniteAutomatonTest {
 	@Test
 	public void testCopyAlphabet() throws Exception {
 		final MutableFiniteAutomaton<Integer> automaton = createAutomaton();
-		automaton.createStates(S1, S2)
+		automaton.createState(S1, NOT_ACCEPTING)
+					.createState(S2, ACCEPTING)
 					.setStartState(S1)
 					.createTransition(S1, S2, 0)
 					.createTransition(S2, S2, 1);
@@ -346,7 +350,8 @@ public abstract class AbstractFiniteAutomatonTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testCopyCircularAutomaton() throws Exception {
-		automaton.createStates(S1, S2)
+		automaton.createState(S1, NOT_ACCEPTING)
+					.createState(S2, ACCEPTING)
 					.setStartState(S1)
 					.createTransition(S1, S2, TOKEN)
 					.createTransition(S2, S1, TOKEN);
@@ -356,12 +361,14 @@ public abstract class AbstractFiniteAutomatonTest {
 
 	@Test
 	public void testCompareCircularAutomata() throws Exception {
-		automaton.createStates(S1, S2)
+		automaton.createState(S1, NOT_ACCEPTING)
+					.createState(S2, ACCEPTING)
 					.setStartState(S1)
 					.createTransition(S1, S2, TOKEN)
 					.createTransition(S2, S1, TOKEN);
 		final MutableFiniteAutomaton<Object> other = createAutomaton();
-		other.createStates(T1, T2)
+		other.createState(T1, NOT_ACCEPTING)
+				.createState(T2, ACCEPTING)
 				.setStartState(T1)
 				.createTransition(T1, T2, TOKEN)
 				.createTransition(T2, T1, TOKEN);
@@ -370,31 +377,31 @@ public abstract class AbstractFiniteAutomatonTest {
 
 	@Test
 	public void testAllAutomataWithoutStartStatesAreEqual() throws Exception {
-		automaton.createStates(S1)
+		automaton.createState(S1, NOT_ACCEPTING)
 					.createTransition(S1, S1, "foobar");
 		final MutableFiniteAutomaton<Object> other = createAutomaton();
-		other.createStates(T1)
+		other.createState(T1, NOT_ACCEPTING)
 				.createTransition(T1, T1, 23);
 		Assert.assertEquals(automaton, other);
 	}
 
 	@Test
 	public void testCompareToAutomatonWithoutStartState() throws Exception {
-		automaton.createStates(S1)
+		automaton.createState(S1, NOT_ACCEPTING)
 					.setStartState(S1)
 					.createTransition(S1, S1, TOKEN);
 		final MutableFiniteAutomaton<Object> other = createAutomaton();
-		other.createStates(S1)
+		other.createState(S1, NOT_ACCEPTING)
 				.createTransition(S1, S1, TOKEN);
 		Assert.assertNotEquals(automaton, other);
 	}
 
 	@Test
 	public void testCompareAutomatonWithoutStartState() throws Exception {
-		automaton.createStates(S1)
+		automaton.createState(S1, NOT_ACCEPTING)
 					.createTransition(S1, S1, TOKEN);
 		final MutableFiniteAutomaton<Object> other = createAutomaton();
-		other.createStates(S1)
+		other.createState(S1, NOT_ACCEPTING)
 				.setStartState(S1)
 				.createTransition(S1, S1, TOKEN);
 		Assert.assertNotEquals(automaton, other);
@@ -402,25 +409,25 @@ public abstract class AbstractFiniteAutomatonTest {
 
 	@Test
 	public void testAllButAcceptingStatesEqual() throws Exception {
-		automaton.createStates(S1, S2)
+		automaton.createState(S1, ACCEPTING)
+					.createState(S2, NOT_ACCEPTING)
 					.setStartState(S1)
-					.addAcceptingStates(S1)
 					.createTransition(S1, S2, TOKEN);
 		final MutableFiniteAutomaton<Object> other = createAutomaton();
-		other.createStates(T1, T2)
+		other.createState(T1, NOT_ACCEPTING)
+				.createState(T2, ACCEPTING)
 				.setStartState(T1)
-				.addAcceptingStates(T2)
 				.createTransition(T1, T2, TOKEN);
 		Assert.assertNotEquals(automaton, other);
 	}
 
 	@Test
 	public void testStructuralInequalTokenTypes() throws Exception {
-		automaton.createStates(S1)
+		automaton.createState(S1, NOT_ACCEPTING)
 					.setStartState(S1)
 					.createTransition(S1, S1, "foobar");
 		final MutableFiniteAutomaton<Object> other = createAutomaton();
-		other.createStates(T1)
+		other.createState(T1, NOT_ACCEPTING)
 				.setStartState(T1)
 				.createTransition(T1, T1, 23);
 		Assert.assertNotEquals(automaton, other);
@@ -428,12 +435,14 @@ public abstract class AbstractFiniteAutomatonTest {
 
 	@Test
 	public void testCompareWithAutomatonWithMissingTransitions() throws Exception {
-		automaton.createStates(S1, S2)
+		automaton.createState(S1, NOT_ACCEPTING)
+					.createState(S2, ACCEPTING)
 					.setStartState(S1)
 					.createTransition(S1, S2, TOKEN)
 					.createTransition(S2, S2, TOKEN);
 		final MutableFiniteAutomaton<Object> other = createAutomaton();
-		other.createStates(S1, S2)
+		other.createState(S1, NOT_ACCEPTING)
+				.createState(S2, ACCEPTING)
 				.setStartState(S1)
 				.createTransition(S1, S2, TOKEN);
 		Assert.assertNotEquals(automaton, other);
@@ -441,15 +450,14 @@ public abstract class AbstractFiniteAutomatonTest {
 
 	@Test
 	public void testStructuralInequality() throws Exception {
-		automaton.createStates(S1)
+		automaton.createState(S1, ACCEPTING)
 					.setStartState(S1)
-					.addAcceptingStates(S1)
 					.createTransition(S1, S1, TOKEN);
 		// This automaton is logically(!) equivalent:
 		final MutableFiniteAutomaton<Object> other = createAutomaton();
-		other.createStates(T1, T2)
+		other.createState(T1, ACCEPTING)
+				.createState(T2, ACCEPTING)
 				.setStartState(T1)
-				.addAcceptingStates(T1, T2)
 				.createTransition(T1, T2, TOKEN)
 				.createTransition(T2, T2, TOKEN);
 		Assert.assertNotEquals(automaton, other);
@@ -457,17 +465,17 @@ public abstract class AbstractFiniteAutomatonTest {
 
 	@Test
 	public void testStructuralEquality() throws Exception {
-		automaton.createStates(S1, S2)
+		automaton.createState(S1, ACCEPTING)
+					.createState(S2, NOT_ACCEPTING)
 					.setStartState(S1)
-					.addAcceptingStates(S1)
 					.createTransition(S1, S1, 1)
 					.createTransition(S1, S2, 0)
 					.createTransition(S2, S2, 1)
 					.createTransition(S2, S1, 0);
 		final MutableFiniteAutomaton<Object> other = createAutomaton();
-		other.createStates(T1, T2)
+		other.createState(T1, ACCEPTING)
+				.createState(T2, NOT_ACCEPTING)
 				.setStartState(T1)
-				.addAcceptingStates(T1)
 				.createTransition(T1, T1, 1)
 				.createTransition(T1, T2, 0)
 				.createTransition(T2, T2, 1)
@@ -477,25 +485,32 @@ public abstract class AbstractFiniteAutomatonTest {
 
 	@Ignore("Structural equality comparison cannot be exhaustive, because we cannot compare unreachable/disconnected components.")
 	@Test
-	public void testStructuralEqualityWithUnreachableStates() throws Exception {
-		automaton.createStates(S1, S2);
+	public
+			void testStructuralEqualityWithUnreachableStates() throws Exception {
+		automaton.createState(S1, NOT_ACCEPTING)
+					.createState(S2, NOT_ACCEPTING);
 		final MutableFiniteAutomaton<Object> other = createAutomaton();
-		other.createStates(T1, T2);
+		other.createState(T1, NOT_ACCEPTING)
+				.createState(
+						T2, NOT_ACCEPTING);
 		Assert.assertEquals(automaton, other);
 	}
 
 	@Ignore("Structural equality comparison cannot be exhaustive, because we cannot compare unreachable/disconnected components.")
 	@Test
-	public void testStructuralInequalityWithUnreachableStates() throws Exception {
-		automaton.createStates(S1);
+	public
+			void testStructuralInequalityWithUnreachableStates() throws Exception {
+		automaton.createState(S1, NOT_ACCEPTING);
 		final MutableFiniteAutomaton<Object> other = createAutomaton();
-		other.createStates(T1, T2);
+		other.createState(T1, NOT_ACCEPTING)
+				.createState(T2, NOT_ACCEPTING);
 		Assert.assertNotEquals(automaton, other);
 	}
 
 	@Test
 	public void testTokensNotCopied() throws Exception {
-		automaton.createStates(S1, S2)
+		automaton.createState(S1, NOT_ACCEPTING)
+					.createState(S2, ACCEPTING)
 					.createTransition(S1, S2, TOKEN);
 		final FiniteAutomaton<Object> copy = automaton.copy();
 		final Collection<Object> alphabet = copy.getAlphabet();

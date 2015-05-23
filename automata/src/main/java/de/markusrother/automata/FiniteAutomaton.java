@@ -19,8 +19,6 @@ public interface FiniteAutomaton<T> extends TransitionFunction<T> {
 
 	Collection<AutomatonState> getStates();
 
-	AutomatonState getState(String label);
-
 	AutomatonState getStartState();
 
 	boolean hasStartState();

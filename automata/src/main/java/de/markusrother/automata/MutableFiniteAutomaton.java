@@ -9,11 +9,10 @@ import de.markusrother.automata.exceptions.NoSuchStateException;
  */
 public interface MutableFiniteAutomaton<T> extends FiniteAutomaton<T> {
 
-	MutableFiniteAutomaton<T> createStates(String... stateLabels) throws DuplicateStateException;
+	MutableFiniteAutomaton<T> createState(String stateLabel, EitherOrAccepting eitherOrAccepting)
+			throws DuplicateStateException;
 
 	MutableFiniteAutomaton<T> setStartState(String startStateLabel) throws NoSuchStateException;
-
-	MutableFiniteAutomaton<T> addAcceptingStates(String... acceptingStateLabels) throws NoSuchStateException;
 
 	MutableFiniteAutomaton<T> createTransition(String originLabel, String targetLabel, T token)
 			throws NoSuchStateException,

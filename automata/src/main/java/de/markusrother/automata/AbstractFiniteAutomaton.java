@@ -1,6 +1,7 @@
 package de.markusrother.automata;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.stream.Collectors;
@@ -29,27 +30,21 @@ public abstract class AbstractFiniteAutomaton<T> implements MutableFiniteAutomat
 
 	@Override
 	public Collection<T> getAlphabet() {
-		return alphabet;
-	}
-
-	@Override
-	public MutableFiniteAutomaton<T> createStates(String... labels) throws DuplicateStateException {
-		for (String label : labels) {
-			createState(label);
-		}
-		return this;
+		return Collections.unmodifiableCollection(alphabet);
 	}
 
 	@Override
 	public Collection<AutomatonState> getStates() {
-		return states;
+		return Collections.unmodifiableCollection(states);
 	}
 
-	private FiniteAutomaton<T> createState(String label) throws DuplicateStateException {
+	@Override
+	public MutableFiniteAutomaton<T> createState(String label, EitherOrAccepting eitherOrAccepting)
+			throws DuplicateStateException {
 		if (hasState(label)) {
 			throw new DuplicateStateException(label);
 		}
-		final AutomatonState state = new AutomatonStateImpl(label);
+		final AutomatonState state = new AutomatonStateImpl(label, eitherOrAccepting);
 		addState(state);
 		return this;
 	}
@@ -67,8 +62,7 @@ public abstract class AbstractFiniteAutomaton<T> implements MutableFiniteAutomat
 						.anyMatch(s -> s.hasLabel(label));
 			}
 
-	@Override
-	public AutomatonState getState(String label) {
+	protected AutomatonState getState(String label) {
 		return states.stream()
 						.filter(s -> s.hasLabel(label))
 						.findFirst()
@@ -142,25 +136,6 @@ public abstract class AbstractFiniteAutomaton<T> implements MutableFiniteAutomat
 	}
 
 	@Override
-	public MutableFiniteAutomaton<T> addAcceptingStates(String... labels) throws NoSuchStateException {
-		for (String label : labels) {
-			addAcceptingState(label);
-		}
-		return this;
-	}
-
-	private FiniteAutomaton<T> addAcceptingState(String label) throws NoSuchStateException {
-		// It would be nice if states were immutable. We would have to replace the old state from our collection of
-		// states, and also we would need to update all transitions, referencing the old state.
-		// We could base transitions on labels only, instead of state instances.
-		// That would be a rather primitive solution, but might be an interesting refactoring, because it would really
-		// decouple transitions from states.
-		final AutomatonState state = getExistingState(label);
-		state.setAccepting(true);
-		return this;
-	}
-
-	@Override
 	public MutableFiniteAutomaton<T> createTransition(String originLabel, String targetLabel, T token)
 			throws NoSuchStateException, DuplicateTransitionException {
 		if (token == null) {
@@ -208,7 +183,7 @@ public abstract class AbstractFiniteAutomaton<T> implements MutableFiniteAutomat
 
 	@Override
 	public Collection<AutomatonTransition<T>> getTransitions() {
-		return transitions;
+		return Collections.unmodifiableCollection(transitions);
 	}
 
 	@Override
@@ -237,18 +212,16 @@ public abstract class AbstractFiniteAutomaton<T> implements MutableFiniteAutomat
 		try {
 			copyStatesFrom(other);
 			copyStartStateFrom(other);
-			copyAcceptingStatesFrom(other);
 			copyTransitionsFrom(other);
 		}
-		catch (NoSuchStateException | DuplicateStateException | DuplicateTransitionException e) {
+		catch (NoSuchStateException | DuplicateTransitionException e) {
 			throw new IllegalStateException(e);
 		}
 	}
 
-	protected void copyStatesFrom(final FiniteAutomaton<T> other) throws DuplicateStateException {
+	protected void copyStatesFrom(final FiniteAutomaton<T> other) {
 		for (AutomatonState state : other.getStates()) {
-			final String stateLabel = state.getLabel();
-			createState(stateLabel);
+			addState(state.copy());
 		}
 	}
 
@@ -257,13 +230,6 @@ public abstract class AbstractFiniteAutomaton<T> implements MutableFiniteAutomat
 			final String startStateLabel = other.getStartState()
 												.getLabel();
 			setStartState(startStateLabel);
-		}
-	}
-
-	protected void copyAcceptingStatesFrom(FiniteAutomaton<T> other) throws NoSuchStateException {
-		for (AutomatonState state : other.getAcceptingStates()) {
-			final String stateLabel = state.getLabel();
-			addAcceptingState(stateLabel);
 		}
 	}
 

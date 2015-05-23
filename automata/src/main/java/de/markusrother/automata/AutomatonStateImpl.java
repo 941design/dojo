@@ -3,11 +3,11 @@ package de.markusrother.automata;
 class AutomatonStateImpl implements AutomatonState {
 
 	private final String label;
+	private final EitherOrAccepting eitherOrAccepting;
 
-	private boolean accepting;
-
-	public AutomatonStateImpl(String label) {
+	public AutomatonStateImpl(String label, EitherOrAccepting eitherOrAccepting) {
 		this.label = label;
+		this.eitherOrAccepting = eitherOrAccepting;
 	}
 
 	@Override
@@ -21,18 +21,18 @@ class AutomatonStateImpl implements AutomatonState {
 	}
 
 	@Override
-	public void setAccepting(boolean accepting) {
-		this.accepting = accepting;
-	}
-
-	@Override
 	public boolean isAccepting() {
-		return accepting;
+		return eitherOrAccepting.isAccepting();
 	}
 
 	@Override
 	public String toString() {
 		return label;
+	}
+
+	@Override
+	public AutomatonState copy() {
+		return new AutomatonStateImpl(label, eitherOrAccepting);
 	}
 
 }

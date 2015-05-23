@@ -17,12 +17,6 @@ class NullState implements AutomatonState {
 		return false;
 	}
 
-	@SuppressWarnings("unused")
-	@Override
-	public void setAccepting(boolean b) {
-		throw new UnsupportedOperationException();
-	}
-
 	@Override
 	public String getLabel() {
 		throw new UnsupportedOperationException();
@@ -37,6 +31,11 @@ class NullState implements AutomatonState {
 	@Override
 	public String toString() {
 		return "NULL";
+	}
+
+	@Override
+	public AutomatonState copy() {
+		throw new UnsupportedOperationException();
 	}
 
 }

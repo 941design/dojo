@@ -40,7 +40,7 @@ public class DeterministicFiniteAutomaton<T> extends AbstractFiniteAutomaton<T> 
 		}
 		final AutomatonTransition<T> transition = getTransition(predecessor, token);
 		final AutomatonState successor = transition == null ? getNullState() : transition.getTarget();
-		return Collections.unmodifiableCollection(Arrays.asList(successor));
+		return Arrays.asList(successor);
 	}
 
 	@Override

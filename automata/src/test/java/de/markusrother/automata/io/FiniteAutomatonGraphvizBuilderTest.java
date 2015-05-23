@@ -1,5 +1,7 @@
 package de.markusrother.automata.io;
 
+import static de.markusrother.automata.EitherOrAccepting.ACCEPTING;
+import static de.markusrother.automata.EitherOrAccepting.NOT_ACCEPTING;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.StringWriter;
@@ -54,7 +56,7 @@ public class FiniteAutomatonGraphvizBuilderTest {
 	@Test(expected = NoAcceptingStatesException.class)
 	public void testAutomatonNeedsAcceptingStates() throws Exception {
 		final MutableFiniteAutomaton<String> dfa = new DeterministicFiniteAutomaton<String>();
-		dfa.createStates(S1)
+		dfa.createState(S1, NOT_ACCEPTING)
 			.setStartState(S1);
 		final Writer out = Mockito.mock(Writer.class);
 		FiniteAutomatonGraphvizBuilder.write(dfa, out);
@@ -63,9 +65,8 @@ public class FiniteAutomatonGraphvizBuilderTest {
 	@Test
 	public void testWriteDotFlushesWriter() throws Exception {
 		final MutableFiniteAutomaton<String> dfa = new DeterministicFiniteAutomaton<String>();
-		dfa.createStates(S1)
-			.setStartState(S1)
-			.addAcceptingStates(S1);
+		dfa.createState(S1, ACCEPTING)
+			.setStartState(S1);
 		final Writer out = Mockito.mock(Writer.class);
 		FiniteAutomatonGraphvizBuilder.write(dfa, out);
 		Mockito.verify(out, Mockito.times(1))
@@ -75,9 +76,8 @@ public class FiniteAutomatonGraphvizBuilderTest {
 	@Test
 	public void testWriteDotClosesWriter() throws Exception {
 		final MutableFiniteAutomaton<String> dfa = new DeterministicFiniteAutomaton<String>();
-		dfa.createStates(S1)
-			.setStartState(S1)
-			.addAcceptingStates(S1);
+		dfa.createState(S1, ACCEPTING)
+			.setStartState(S1);
 		final Writer out = Mockito.mock(Writer.class);
 		FiniteAutomatonGraphvizBuilder.write(dfa, out);
 		Mockito.verify(out, Mockito.times(1))
@@ -87,9 +87,8 @@ public class FiniteAutomatonGraphvizBuilderTest {
 	@Test
 	public void testWriteHeader() throws Exception {
 		final MutableFiniteAutomaton<String> dfa = new DeterministicFiniteAutomaton<String>();
-		dfa.createStates(S1)
-			.setStartState(S1)
-			.addAcceptingStates(S1);
+		dfa.createState(S1, ACCEPTING)
+			.setStartState(S1);
 		final Writer out = new StringWriter();
 		FiniteAutomatonGraphvizBuilder.write(dfa, out);
 		assertThat(out.toString(),
@@ -99,9 +98,10 @@ public class FiniteAutomatonGraphvizBuilderTest {
 	@Test
 	public void testWriteStates() throws Exception {
 		final MutableFiniteAutomaton<String> dfa = new DeterministicFiniteAutomaton<String>();
-		dfa.createStates(S1, S2, S3)
-			.setStartState(S1)
-			.addAcceptingStates(S3);
+		dfa.createState(S1, NOT_ACCEPTING)
+			.createState(S2, NOT_ACCEPTING)
+			.createState(S3, ACCEPTING)
+			.setStartState(S1);
 		final Writer out = new StringWriter();
 		FiniteAutomatonGraphvizBuilder.write(dfa, out);
 		assertThat(out.toString(),
@@ -111,9 +111,8 @@ public class FiniteAutomatonGraphvizBuilderTest {
 	@Test
 	public void testWriteVirtualStartState() throws Exception {
 		final MutableFiniteAutomaton<String> dfa = new DeterministicFiniteAutomaton<String>();
-		dfa.createStates(S1)
-			.setStartState(S1)
-			.addAcceptingStates(S1);
+		dfa.createState(S1, ACCEPTING)
+			.setStartState(S1);
 		final Writer out = new StringWriter();
 		FiniteAutomatonGraphvizBuilder.write(dfa, out);
 		assertThat(out.toString(),
@@ -124,9 +123,9 @@ public class FiniteAutomatonGraphvizBuilderTest {
 	@Test
 	public void testWriteAcceptingStates() throws Exception {
 		final MutableFiniteAutomaton<String> dfa = new DeterministicFiniteAutomaton<String>();
-		dfa.createStates(S1, S2)
-			.setStartState(S1)
-			.addAcceptingStates(S1, S2);
+		dfa.createState(S1, ACCEPTING)
+			.createState(S2, ACCEPTING)
+			.setStartState(S1);
 		final Writer out = new StringWriter();
 		FiniteAutomatonGraphvizBuilder.write(dfa, out);
 		assertThat(out.toString(),
@@ -137,9 +136,9 @@ public class FiniteAutomatonGraphvizBuilderTest {
 	@Test
 	public void testWriteTransitions() throws Exception {
 		final MutableFiniteAutomaton<String> dfa = new DeterministicFiniteAutomaton<String>();
-		dfa.createStates(S1, S2)
+		dfa.createState(S1, NOT_ACCEPTING)
+			.createState(S2, ACCEPTING)
 			.setStartState(S1)
-			.addAcceptingStates(S2)
 			.createTransition(S1, S2, TOKEN)
 			.createTransition(S1, S1, TOKEN);
 		final Writer out = new StringWriter();
@@ -151,9 +150,9 @@ public class FiniteAutomatonGraphvizBuilderTest {
 	@Test
 	public void testWriteEmptyTransitions() throws Exception {
 		final NonDeterministicFiniteAutomaton<String> dfa = new NonDeterministicFiniteAutomaton<String>();
-		dfa.createStates(S1, S2)
+		dfa.createState(S1, NOT_ACCEPTING)
+			.createState(S2, ACCEPTING)
 			.setStartState(S1)
-			.addAcceptingStates(S2)
 			.createEmptyTransition(S1, S2);
 		final Writer out = new StringWriter();
 		FiniteAutomatonGraphvizBuilder.write(dfa, out);
@@ -164,9 +163,9 @@ public class FiniteAutomatonGraphvizBuilderTest {
 	@Test
 	public void testShow() throws Exception {
 		final MutableFiniteAutomaton<String> dfa = new DeterministicFiniteAutomaton<String>();
-		dfa.createStates(S1, S2)
+		dfa.createState(S1, NOT_ACCEPTING)
+			.createState(S2, ACCEPTING)
 			.setStartState(S1)
-			.addAcceptingStates(S2)
 			.createTransition(S1, S2, TOKEN)
 			.createTransition(S1, S1, TOKEN);
 		final Writer out = new StringWriter();
