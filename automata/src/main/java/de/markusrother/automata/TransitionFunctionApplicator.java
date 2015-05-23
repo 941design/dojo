@@ -40,21 +40,16 @@ class TransitionFunctionApplicator<T> implements Iterator<Collection<AutomatonSt
 		return currentStates;
 	}
 
+	public Collection<AutomatonState> getCurrentStates() {
+		return currentStates;
+	}
+
 	private Collection<AutomatonState> collectSuccessors(Collection<AutomatonState> predecessors, T token)
 			throws NotInAlphabetException, InvalidOriginException {
 		return predecessors.stream()
 					.flatMap(predecessor -> transitionFunction.getSuccessors(predecessor, token)
 																		.stream())
 					.collect(Collectors.toList());
-	}
-
-	boolean isAccepting() {
-		return containsAcceptingState(currentStates);
-	}
-
-	private static boolean containsAcceptingState(Collection<AutomatonState> states) {
-		return states.stream()
-						.anyMatch(s -> s.isAccepting());
 	}
 
 	@Override

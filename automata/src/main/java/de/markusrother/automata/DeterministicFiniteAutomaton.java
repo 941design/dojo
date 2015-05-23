@@ -56,7 +56,7 @@ public class DeterministicFiniteAutomaton<T> extends AbstractFiniteAutomaton<T> 
 		while (runner.hasNext()) {
 			runner.next();
 		}
-		return runner.isAccepting();
+		return containsAcceptingState(runner.getCurrentStates());
 	}
 
 }

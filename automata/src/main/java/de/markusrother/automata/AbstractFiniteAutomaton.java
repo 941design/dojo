@@ -129,6 +129,11 @@ public abstract class AbstractFiniteAutomaton<T> implements FiniteAutomaton<T> {
 						.anyMatch(s -> s.isAccepting());
 	}
 
+	protected boolean containsAcceptingState(Collection<AutomatonState> states) {
+		return states.stream()
+						.anyMatch(s -> s.isAccepting());
+	}
+
 	@Override
 	public Collection<AutomatonState> getAcceptingStates() {
 		return states.stream()

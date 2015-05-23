@@ -128,7 +128,7 @@ public class NonDeterministicFiniteAutomaton<T> extends AbstractFiniteAutomaton<
 		while (runner.hasNext()) {
 			runner.next();
 		}
-		return runner.isAccepting();
+		return containsAcceptingState(runner.getCurrentStates());
 	}
 
 }
