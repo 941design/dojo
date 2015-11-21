@@ -19,8 +19,22 @@ successors = { 'I': 'V',
 	     }
 
 
-def successor(numeral):
+predecessors = { 'I': None,
+ 	         'V': 'I',
+	         'X': 'V',
+	         'L': 'X',
+	         'C': 'L',
+ 	         'D': 'C',
+ 	         'M': 'D',
+	       }
+
+
+def succ(numeral):
 	return successors[numeral]
+
+
+def pred(numeral):
+	return predecessors[numeral]
 
 
 def inc(r):
@@ -66,7 +80,7 @@ def inc(r):
 		if r.endswith('IIII') \
 		or r.endswith('XXXX') \
 		or r.endswith('CCCC'):
-			r = r[:-3] + successor(r[-1])
+			r = r[:-3] + succ(r[-1])
 		elif r.endswith('MMMM'):
 			raise Exception()
 		elif r.endswith('IVI') \
@@ -79,9 +93,51 @@ def inc(r):
 		elif r.endswith('VIV') \
 		or r.endswith('LXL') \
 		or r.endswith('DCD'):
-			r = r[:-3] + r[-2] + successor(r[-1])
+			r = r[:-3] + r[-2] + succ(r[-1])
 		else:
 			break
+	return r
+
+
+def dec(r):
+	"""
+	>>> dec('II')
+	'I'
+	>>> dec('IV')
+	'III'
+	>>> dec('V')
+	'IV'
+	>>> dec('VI')
+	'V'
+	>>> dec('IX')
+	'VIII'
+	>>> dec('X')
+	'IX'
+	>>> r = 'I'
+	>>> for n in range(1,3999):
+	...	assert(r == dec(inc(r)))
+	...     r = inc(r)
+	"""
+	while True:
+		if r.endswith('I'):
+			r = r[:-1]
+			break
+		elif r.endswith('IV') \
+		or r.endswith('XL') \
+		or r.endswith('CD'):
+			r = r[:-2] + 4 * r[-2]
+		if r.endswith('IX') \
+		or r.endswith('XC') \
+		or r.endswith('CM'):
+			r = r[:-2] + pred(r[-1]) + 4 * r[-2]
+		elif r.endswith('X') \
+		or r.endswith('C') \
+		or r.endswith('M'):
+			r = r[:-1] + pred(pred(r[-1])) + r[-1] + pred(pred(r[-1]))
+		elif r.endswith('V') \
+		or r.endswith('L') \
+		or r.endswith('D'):
+			r = r[:-1] + pred(r[-1]) + r[-1] + pred(r[-1])
 	return r
 
 
