@@ -10,37 +10,34 @@ def count_change(money, coins):
     >>> count_change(4, [1, 2])
     3
     """
-    return len(change(money, coins))
+    lookup = {}
+    for m in range(1, money + 1):
+        lookup[m] = change(m, coins, lookup)
+        #print (lookup)
+    return len(lookup[money])
 
 
-memo = {}
-
-def memoize(fn):
-    def closure(money, coins):
-        key = (money, tuple(coins))
-        if not key in memo:
-            memo[key] = fn(money, coins)
-        return memo[key]
-    return closure
-                
-    
-@memoize
-def change(money, coins):
+def change(total, coins, lookup):
     """
-    >>> change(2, [])
-    []
-    >>> sorted(change(2, [1]))
-    [(1, 1)]
-    >>> sorted(change(4, [1, 2]))
-    [(1, 1, 1, 1), (1, 1, 2), (2, 2)]
+    >>> change(1, [1], [])
+    {(1,)}
+    >>> change(3, [1], {1: [(1,)], 2: [(1, 1)]})
+    {(1, 1, 1)}
+    >>> change(3, [1], {2: [(2,)]})
+    {(1, 2)}
+    >>> sorted(change(3, [1], {2: [(1, 1), (2,)]}))
+    [(1, 1, 1), (1, 2)]
+    >>> change(3, [2], [])
+    set()
     """
-    if money == 0 or not coins:
-        return []
-    options = set()
+    coll = set()
     for coin in coins:
-        if money == coin:
-            options.add((coin, ))
-        elif money - coin > 0:
-            for x in change(money-coin, coins):
-                options.add(tuple(sorted((coin, ) + x)))
-    return options
+        rest = total - coin
+        if rest == 0:
+            coll.add((coin, ))
+        elif rest in lookup:
+            for x in lookup[rest]:
+                coll.add(tuple(sorted(x + (coin, ))))
+        else:
+            pass
+    return coll
