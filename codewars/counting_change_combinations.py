@@ -2,9 +2,29 @@ import doctest
 
 
 def count_change(money, coins):
+    """
+    >>> count_change(1, [1])
+    1
+    >>> count_change(2, [1, 2])
+    2
+    >>> count_change(4, [1, 2])
+    3
+    """
     return len(change(money, coins))
 
 
+memo = {}
+
+def memoize(fn):
+    def closure(money, coins):
+        key = (money, tuple(coins))
+        if not key in memo:
+            memo[key] = fn(money, coins)
+        return memo[key]
+    return closure
+                
+    
+@memoize
 def change(money, coins):
     """
     >>> change(2, [])
