@@ -1,3 +1,6 @@
+import pandas as pd
+
+
 class FastaParser(object):
     
     open_symbols = '>'
@@ -5,6 +8,10 @@ class FastaParser(object):
     def __init__(self, file):
         self.file = file
         self.buffer = None
+
+    def parseDataFrame(self):
+        xs = self.parseTuples()
+        return pd.DataFrame(xs, columns=['name', 'dna']).set_index('name')
 
     def parseTuples(self):
         """ Returns list of tuples
