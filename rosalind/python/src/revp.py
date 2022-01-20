@@ -1,17 +1,30 @@
-#! /usr/env python
-
-IN = 'rosalind_revp.txt' #'revp_in.txt'
-OUT = 'revp_out.txt'
-
 MIN = 4
 MAX = 12
 
-# TODO - import ALPHABET and complements from some general lib!
 DICT = dict(zip('ACGT','TGCA'))
 
 
-def reversePalindromes(s): # fn-out, fn-out-p, fn-rec
+def reversePalindromes(s):
     """
+    >>> sorted(reversePalindromes('TCAATGCATGCGGGTCTATATGCAT'))
+    [(3, 6), (4, 4), (5, 6), (6, 4), (16, 4), (17, 4), (19, 6), (20, 4)]
+    >>> sorted(reversePalindromes('ATAT'))
+    [(0, 4)]
+    >>> sorted(reversePalindromes('ATATAT'))
+    [(0, 4), (0, 6), (1, 4), (2, 4)]
+
+    ::start:learnings::
+    
+    My old implementation was insufficient, but passed at that time.
+    I assume the test data from [rosalind.info](https://rosalind.info/problems/revp/)
+    was insufficient itself.
+
+    Overlapping palindromes were not recognized. Neither were
+    palindromes at the dna's very end (same fencepost mistake as in
+    my recent implementation). Current test data probably covers both
+    issues regularly.
+    
+    ::end:learnings::
     """
     #TODO - can be solved by recursion instead !!!
     # maximum recursion depth depends only on MAX
@@ -21,30 +34,13 @@ def reversePalindromes(s): # fn-out, fn-out-p, fn-rec
         for a, b in current:
             if DICT[s[a]] == s[b]: #predicate function on two indices
                 if MIN <= b-a+1 <= MAX: # in-range-function from generator
-                    print a+1, b-a+1 # output function
+                    yield(a, b-a+1)
                 if a > 0: # b can never exceed stream, recursion predicate
                     next.add((a-1, b+1),) # recursion call
         next.add((i, i+1),)
         current = next
 
-if __name__ == """__main__""":
-    """
-    approach:
-    do i need random access ??
-    how many comparisons do i need ?
-    """
 
-    #TODO - call with Arguments MIN, MAX, IN, OUT
-
-    #TODO - redirect stdout
-
-    #TODO - create modules and a map of input files to modules
-    # either include a main method in each module or name the
-    # main method according to the file/task.
-    # then call the file and produce output
-    # add mapping (input file names) to module itself !!!
-    # somewhere into header!
-
-    f = open(IN)
-    reversePalindromes(f.read())
-    f.close()
+def revp(dna):
+    for a, b in reversePalindromes(dna):
+        print(a+1, b)
