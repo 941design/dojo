@@ -22,7 +22,11 @@ def perm(n, write=lambda s: print(s, end='')):
     '''
     k = fac(n)
     write(f'{k}\n')
-    g = permutations_lexicographically(sorted(range(1, n+1), reverse=True))
+    # reversing list, hence becoming lexically largest
+    # therefore, the next permutation will be the lexically smallest
+    xs = sorted(range(1, n+1), reverse=True)
+    # generating permutations incrementally
+    g = permutations_lexicographically(xs)
     for _ in range(k):
         write(' '.join(str(x) for x in next(g)) + '\n')
 
@@ -54,7 +58,7 @@ def sort(xs):
 
 
 def permutations_lexicographically(xs):
-    ''' generates permutations in lexicographic order (indefinitely)
+    ''' generates permutations in lexicographical order (indefinitely)
 
     >>> perm = permutations_lexicographically
     >>> next(perm([1, 2, 4, 3]))
@@ -82,10 +86,9 @@ def permutations_lexicographically(xs):
             i -= 1
             if i == 0: # xs is in reverse lexical order, start from beginning
                 xs = sort(xs)
-                i = len(xs)-1
+                i = len(xs)
                 yield xs
-                break
-            if xs[i] > xs[i-1]:
+            elif xs[i] > xs[i-1]:
                 break
         
         # find smallest x[j], j >= i where x[i-1] < x[j]
