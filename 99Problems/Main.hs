@@ -60,3 +60,12 @@ remdup :: Eq a => [a] -> [a]
 remdup [] = []
 remdup [x] = [x]
 remdup (x:y:xs) = if x == y then remdup (y:xs) else x:(remdup (y:xs))
+
+
+-- | P49 (**) Gray code.
+gray :: Int -> [String]
+gray n = [padded $ bits i | i <- [0..2^n-1]]
+  where bits 0 = "0"
+        bits 1 = "1"
+        bits n = (bits $ n `div` 2) ++ (bits $ n `mod` 2)
+        padded s = (take (n - length s) $ repeat '0') ++ s
