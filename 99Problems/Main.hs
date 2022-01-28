@@ -83,6 +83,12 @@ packl :: Eq a => [a] -> [(Int, a)]
 packl xs = [(len xs, head xs) | xs <- pack xs]
 
 
+-- | P12 (**) Decode a run-length encoded list.
+unpackl :: [(Int, a)] -> [a]
+unpackl [] = []
+unpackl ((n, x):xs) = (take n $ repeat x) ++ unpackl xs
+
+
 -- | P49 (**) Gray code.
 gray :: Int -> [String]
 gray n = [padded $ bits i | i <- [0..2^n-1]]
