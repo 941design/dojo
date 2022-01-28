@@ -62,6 +62,22 @@ remdup [x] = [x]
 remdup (x:y:xs) = if x == y then remdup (y:xs) else x:(remdup (y:xs))
 
 
+-- | P09 (**) Pack consecutive duplicates of list elements into sublists.
+pack :: Eq a => [a] -> [[a]]
+pack [] = []
+pack xs = [first] ++ pack remainder
+  where first = takewhile (== head xs) xs
+        remainder = dropwhile (== head xs) xs
+        takewhile _ [] = []
+        takewhile p (x:xs)
+          | p x = x:takewhile p xs
+          | otherwise = []
+        dropwhile _ [] = []
+        dropwhile p xs@(y:ys)
+          | p y = dropwhile p ys
+          | otherwise = xs
+
+
 -- | P49 (**) Gray code.
 gray :: Int -> [String]
 gray n = [padded $ bits i | i <- [0..2^n-1]]
