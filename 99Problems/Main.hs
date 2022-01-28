@@ -89,6 +89,21 @@ unpackl [] = []
 unpackl ((n, x):xs) = (take n $ repeat x) ++ unpackl xs
 
 
+-- | P13 (**) Run-length encoding of a list (direct solution).
+packl2 :: Eq a => [a] -> [(Int, a)]
+packl2 [] = []
+packl2 (x:xs) = acc ++ [(i, c)]
+  where
+    (i, c, acc) = reduce fn (1, x, []) xs
+    -- TODO - consider a right fold
+    reduce :: (acc -> a -> acc) -> acc -> [a] -> acc
+    reduce fn acc [] = acc
+    reduce fn acc (x:xs) = reduce fn (fn acc x) xs
+    fn (i, c, acc) x
+      | c == x = (i+1, c, acc)
+      | otherwise = (1, x, acc ++ [(i, c)])
+
+
 -- | P49 (**) Gray code.
 gray :: Int -> [String]
 gray n = [padded $ bits i | i <- [0..2^n-1]]
