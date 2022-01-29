@@ -1,19 +1,14 @@
-module Main where
+module Dojo where
 
 
 -- http://aperiodic.net/phil/scala/s-99/
-
-
--- TODO - adapt accordingly as lib
-main :: IO()
-main = undefined
 
 
 -- | P01 (*) Find the last element of a list.
 last :: [a] -> a
 last [] = error "empty list"
 last [x] = x
-last (x:xs) = Main.last xs
+last (x:xs) = Dojo.last xs
 
 
 -- | P02 (*) Find the last but one element of a list.
@@ -40,13 +35,13 @@ len (x:xs) = 1 + len xs
 reverse :: [a] -> [a]
 reverse [] = []
 reverse [x] = [x]
-reverse (x:xs) = (Main.reverse xs) ++ [x]
+reverse (x:xs) = (Dojo.reverse xs) ++ [x]
 
 
 -- | P06 (*) Find out whether a list is a palindrome.
 palindrome :: Eq a => [a] -> Bool
 palindrome [] = True
-palindrome xs = xs == Main.reverse xs
+palindrome xs = xs == Dojo.reverse xs
 
 
 -- | P07 (**) Flatten a nested list structure.
