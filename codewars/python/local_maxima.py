@@ -5,8 +5,8 @@ def pick_peaks(xs):
     ::start:learnings::
     
     Although seemingly more concise than my 2015 solution below, this solution
-    has a significant downside. There is a hidden O(n^2) complexity when comparing
-    sublists, whereas the 2015 solution only needs a single pass.
+    has a downside. There is a hidden complexity when comparing sublists,
+    whereas the 2015 solution only needs a single pass.
 
     This is of practical relevance, for languages in which collection comparison
     is trivial to write.
